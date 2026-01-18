@@ -49,6 +49,7 @@ func _process(delta: float) -> void:
 	$Arrow.target = current._path_follow
 	cursor_pos = grid.calculate_grid_coordinates(camera.get_cursor_world_position())
 	cursor_pos = grid.clamp(cursor_pos)
+	#print(occupied_tiles)
 	$Cursor.position = grid.calculate_map_position(cursor_pos+cursor_offset)
 	#print(cursor_pos)
 	#print($Cursor.position)
@@ -59,14 +60,14 @@ func _process(delta: float) -> void:
 	#print(occupied_tiles)
 func _flood_fill(cell: Vector3, max_distance: int) -> Array:
 	var array := []
-	var stack := [cell]
+	var queue := [cell]
 	var came_from := {}
 	var cost := {}
 	
 	cost[cell] = max_distance
 	came_from[cell] = null
-	while not stack.is_empty():
-		var current = stack.pop_back()
+	while not queue.is_empty():
+		var current = queue.pop_front()
 
 		if not grid.is_within_bounds(current):
 			continue
@@ -74,6 +75,8 @@ func _flood_fill(cell: Vector3, max_distance: int) -> Array:
 			continue
 		if cost[current] < 0:
 			continue
+			
+		#cost system for pathfinding for future implementation with different cost terrains
 
 
 		array.append(current)
@@ -87,7 +90,7 @@ func _flood_fill(cell: Vector3, max_distance: int) -> Array:
 				cost[coordinates] = cost[current] - 1
 				came_from[coordinates] = current
 
-			stack.append(coordinates)
+			queue.append(coordinates)
 	return array
 
 func select_unit_for_movement(cell: Vector3) -> void:
@@ -95,13 +98,15 @@ func select_unit_for_movement(cell: Vector3) -> void:
 		return
 	var points = _flood_fill(current.cell, current.action_points)
 	for i in points:
-		$Ground.set_cell_item(i, 0)
+		#await get_tree().create_timer(0.1).timeout 
+		$Overlay.set_cell_item(i, 0)
 	$ArrowMap.initialise(points)
 	unit_selected_for_movement = true
 	
 func deselect_unit_for_movement(cell: Vector3) -> void:
 	$ArrowMap.stop()
 	unit_selected_for_movement = false
+	$Overlay.clear()
 	
 func is_occupied(cell: Vector3) -> bool:
 	return is_occupied_by_unit(cell)

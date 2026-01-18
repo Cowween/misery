@@ -28,12 +28,6 @@ data = {
 script = ExtResource("2_dq3d8")
 metadata/_editor_floor_ = Vector3(0, 0, 0)
 
-[node name="Character1" parent="." instance=ExtResource("2_r85wr")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
-speed = 10
-max_hp = 100
-initial_cell = Vector3(1, 0, 0)
-
 [node name="SignalBus" type="Node" parent="."]
 script = ExtResource("5_3d4e3")
 
@@ -55,6 +49,10 @@ sensitivity = 100
 transform = Transform3D(1, 0, 0, 0, 0.858701, 0.512478, 0, -0.512478, 0.858701, -0.489256, 4.76222, 8.58342)
 script = ExtResource("8_ypjsh")
 
+[node name="Overlay" type="GridMap" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 0)
+mesh_library = ExtResource("1_ct31n")
+
 [node name="ArrowMap" type="GridMap" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0)
 mesh_library = ExtResource("9_ejrs7")
@@ -68,7 +66,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.74361, 1.18289, -6.32617)
 [node name="Character" parent="." instance=ExtResource("2_r85wr")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.48616, 2.41666, 0)
 max_hp = 100
-initial_cell = Vector3(2, 0, 0)
+initial_cell = Vector3(5, 0, 3)
 
 [connection signal="next_turn" from="BattleUI" to="SignalBus" method="_on_battle_ui_next_turn"]
 [connection signal="action_done" from="SignalBus" to="." method="_on_signal_bus_action_done"]

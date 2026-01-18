@@ -11,7 +11,7 @@ max_hp = null
 atk_range = null
 
 [node name="PathFollow3D" type="PathFollow3D" parent="."]
-progress = 384.058
+progress = 395.136
 rotation_mode = 1
 loop = false
 tilt_enabled = false

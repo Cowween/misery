@@ -1,0 +1,43 @@
+[gd_scene load_steps=8 format=3 uid="uid://cn3s6qne74y30"]
+
+[ext_resource type="Texture2D" uid="uid://dkiv8rdd2oxol" path="res://Assets/icon.svg" id="1_i22iv"]
+[ext_resource type="Texture2D" uid="uid://daovyp8lu56ac" path="res://Assets/tile.png" id="2_rinnr"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_qq2nn"]
+albedo_texture = ExtResource("1_i22iv")
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_be8im"]
+material = SubResource("StandardMaterial3D_qq2nn")
+
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_mkgt0"]
+points = PackedVector3Array(1.01587, 0.015873, 1.01587, -1.01587, -0.015873, -1.01587, -1.01587, 0.015873, -1.01587, 1.01587, -0.015873, -1.01587, -1.01587, -0.015873, 1.01587, -1.01587, 0.015873, 1.01587, 1.01587, 0.015873, -1.01587, 1.01587, -0.015873, 1.01587)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_7d5se"]
+albedo_texture = ExtResource("2_rinnr")
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_j4ee8"]
+material = SubResource("StandardMaterial3D_7d5se")
+
+[node name="Tiles" type="Node3D"]
+
+[node name="NormalTile" type="MeshInstance3D" parent="."]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, -1, 0)
+mesh = SubResource("PlaneMesh_be8im")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="NormalTile"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="NormalTile/StaticBody3D"]
+shape = SubResource("ConvexPolygonShape3D_mkgt0")
+
+[node name="Center" type="Node3D" parent="NormalTile"]
+
+[node name="NormalTile2" type="MeshInstance3D" parent="."]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, -1, 4.51838)
+mesh = SubResource("PlaneMesh_j4ee8")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="NormalTile2"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="NormalTile2/StaticBody3D"]
+shape = SubResource("ConvexPolygonShape3D_mkgt0")
+
+[node name="Center" type="Node3D" parent="NormalTile2"]

@@ -1,0 +1,40 @@
+[gd_scene load_steps=10 format=3 uid="uid://d0ksibqvxiuxs"]
+
+[ext_resource type="Texture2D" uid="uid://by81jcoysyk18" path="res://Assets/arrow_length.png" id="1_f3oed"]
+[ext_resource type="Texture2D" uid="uid://ilg3rqe8ibos" path="res://Assets/arrow_head.png" id="2_cb3lj"]
+[ext_resource type="Texture2D" uid="uid://bd88xo4c2omg5" path="res://Assets/arrow_turn.png" id="3_144v7"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_7jtrd"]
+transparency = 1
+albedo_texture = ExtResource("1_f3oed")
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_6nc7w"]
+material = SubResource("StandardMaterial3D_7jtrd")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_6f6b2"]
+transparency = 1
+albedo_texture = ExtResource("2_cb3lj")
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_tixk4"]
+material = SubResource("StandardMaterial3D_6f6b2")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_xx1b3"]
+transparency = 1
+albedo_texture = ExtResource("3_144v7")
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_v3eu0"]
+material = SubResource("StandardMaterial3D_xx1b3")
+
+[node name="Node3D" type="Node3D"]
+
+[node name="ArrowLength" type="MeshInstance3D" parent="."]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0)
+mesh = SubResource("PlaneMesh_6nc7w")
+
+[node name="ArrowLength2" type="MeshInstance3D" parent="."]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 4.72581, 0, 0)
+mesh = SubResource("PlaneMesh_tixk4")
+
+[node name="ArrowLength3" type="MeshInstance3D" parent="."]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 9.73318, 0, 3.97405)
+mesh = SubResource("PlaneMesh_v3eu0")

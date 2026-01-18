@@ -1,0 +1,15 @@
+[gd_scene load_steps=5 format=3 uid="uid://cqho3uyy7s34w"]
+
+[ext_resource type="Texture2D" uid="uid://n31qgyat8lrs" path="res://Assets/cursor.png" id="1_ub2fw"]
+[ext_resource type="Script" path="res://Scripts/cursor.gd" id="2_xgxsg"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_jihoo"]
+transparency = 1
+albedo_texture = ExtResource("1_ub2fw")
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_5sjwo"]
+material = SubResource("StandardMaterial3D_jihoo")
+
+[node name="Cursor" type="MeshInstance3D"]
+mesh = SubResource("PlaneMesh_5sjwo")
+script = ExtResource("2_xgxsg")

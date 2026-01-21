@@ -17,6 +17,8 @@ var dragging = false
 var unit_selected_for_movement = false
 var cursor_pos = Vector3()
 var attacking := false
+var attack_zone := []
+var attack_after_walk := false
 
 
 # Called when the node enters the scene tree for the first time.
@@ -61,7 +63,10 @@ func _process(delta: float) -> void:
 	#print($Cursor.position)
 	#print(current_pos, target_pos)
 	if unit_selected_for_movement:
-		$ArrowMap.draw(current.cell, cursor_pos)
+		var nearest_no_occupy = cursor_pos
+		if is_occupied(cursor_pos):
+			nearest_no_occupy = get_nearest_surrounding_tile(current.cell, cursor_pos)
+		$ArrowMap.draw(current.cell, nearest_no_occupy, current.action_points)
 	#print($Ground.local_to_map($CameraPivot/Camera3D.get_cursor_world_position()))
 	#print(occupied_tiles)
 func _flood_fill(cell: Vector3, max_distance: int, atk: int) -> Dictionary:
@@ -126,11 +131,13 @@ func _flood_fill(cell: Vector3, max_distance: int, atk: int) -> Dictionary:
 	for i in range:
 		fill_inst[i] = 0
 		atk_range.erase(i)
+	attack_zone = atk_range
 	for i in atk_range:
 		fill_inst[i] = 1
 	return fill_inst
 	
 func find_edge_tiles(tiles: Array) -> Array:
+	
 	var edges := []
 
 	for tile in tiles:
@@ -142,6 +149,18 @@ func find_edge_tiles(tiles: Array) -> Array:
 
 	return edges
 
+func get_nearest_surrounding_tile(start: Vector3, end: Vector3) -> Vector3:
+	var dist := 9223372036854775807
+	var result := Vector3()
+	for dir in DIRECTIONS:
+		var temp = end+dir
+		if is_occupied(temp):
+			continue
+		if start.distance_to(temp) < dist:
+			result = temp
+			dist = start.distance_to(temp)
+	return result
+
 func select_unit_for_movement(cell: Vector3) -> void:
 	if cell != current.cell:
 		return
@@ -150,7 +169,7 @@ func select_unit_for_movement(cell: Vector3) -> void:
 	for i in fill_inst:
 		#await get_tree().create_timer(0.1).timeout 
 		$Overlay.set_cell_item(i, fill_inst[i])
-		if fill_inst[i] == 0:
+		if not is_occupied(i):
 			points.append(i)
 	$ArrowMap.initialise(points)
 	unit_selected_for_movement = true
@@ -195,7 +214,7 @@ func _input(event: InputEvent) -> void:
 		if attacking:
 			print("Attacking", cursor_pos, occupied_tiles)
 			print(cursor_pos in occupied_tiles)
-			if cursor_pos in occupied_tiles.values(): #check if cursor position is inside the occupied tiles
+			if cursor_pos in attack_zone and cursor_pos in occupied_tiles.values(): #check if cursor position is inside the occupied tiles
 				print("here")
 				var target = occupied_tiles.find_key(cursor_pos) #convert the cursor to the actual target
 				if target.is_in_group("Characters"):
@@ -209,13 +228,24 @@ func _input(event: InputEvent) -> void:
 			if cursor_pos == current.cell:
 				deselect_unit_for_movement(cursor_pos)
 			else:
+				print(attack_zone)
+				print(cursor_pos)
+				if cursor_pos in attack_zone && occupied_tiles.find_key(cursor_pos).is_in_group("Characters"):
+					attack_after_walk = true
+					print("Attacking after walk")
+					
 				current.walk_along($ArrowMap.current_path)
 				deselect_unit_for_movement(cursor_pos)
 				
 		else:
 			select_unit_for_movement(cursor_pos)
 			
-
+func attack_mode() -> void:
+	var fill_inst = _flood_fill(current.cell, 0, current.atk_range)
+	for i in fill_inst:
+			#await get_tree().create_timer(0.1).timeout 
+		$Overlay.set_cell_item(i, fill_inst[i])
+	
 
 func _on_signal_bus_action_done() -> void:
 	if queue_in_action.size() == 0:
@@ -238,6 +268,10 @@ func _on_signal_bus_action_done() -> void:
 
 func _on_signal_bus_walk_finished() -> void:
 	$BattleUI.AP = current.action_points
+	if attack_after_walk:
+		attack_after_walk = false
+		attacking = true
+		attack_mode()
 
 
 func _on_battle_ui_attack() -> void:
@@ -248,9 +282,6 @@ func _on_battle_ui_attack() -> void:
 		attacking = false
 		print("atk off")
 	else:
-		var fill_inst = _flood_fill(current.cell, 0, current.atk_range)
-		for i in fill_inst:
-			#await get_tree().create_timer(0.1).timeout 
-			$Overlay.set_cell_item(i, fill_inst[i])
+		attack_mode()
 		attacking = true
 		print("atk on")

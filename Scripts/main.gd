@@ -8,7 +8,7 @@ const DIRECTIONS = [Vector3.LEFT, Vector3.RIGHT, Vector3.FORWARD, Vector3.BACK]
 @onready var camera = $CameraContainer/CameraPivot/Camera3D
 @onready var pivot = $CameraContainer/CameraPivot
 
-var occupied_tiles = {}
+var occupied_tiles = {} #occupied_tiles stores a dictionary with a whatever object as a key, and its coordinates as the value
 #initiative
 var queue = []
 var queue_in_action = []
@@ -16,6 +16,7 @@ var current
 var dragging = false
 var unit_selected_for_movement = false
 var cursor_pos = Vector3()
+var attacking := false
 
 
 # Called when the node enters the scene tree for the first time.
@@ -28,12 +29,12 @@ func _ready() -> void:
 	queue.sort_custom(sort_queue)
 	for i in queue:
 		i.SignalBus = $SignalBus
+		occupied_tiles[i] = grid.calculate_grid_coordinates(Vector3i(i.position.x, 0, i.position.z))
 	queue_in_action = queue.duplicate()
 	current = queue_in_action.pop_front()
 	occupied_tiles[current] = null
 	$BattleUI.AP = current.action_points
-	$BattleUI.HP_max = current.max_hp
-	$BattleUI.HP = current.hp
+	$BattleUI.update_p_health(current.max_hp, current.hp)
 	
 	#var points = _flood_fill(current.cell, current.action_points)
 	#print(current.cell)
@@ -49,6 +50,11 @@ func _process(delta: float) -> void:
 	$Arrow.target = current._path_follow
 	cursor_pos = grid.calculate_grid_coordinates(camera.get_cursor_world_position())
 	cursor_pos = grid.clamp(cursor_pos)
+	if cursor_pos in occupied_tiles.values():
+		var target = occupied_tiles.find_key(cursor_pos)
+		$BattleUI.display_enemy_info(target.cname, target.hp, target.max_hp) #display the stats of the target
+	else:
+		$BattleUI.hide_enemy_info()
 	#print(occupied_tiles)
 	$Cursor.position = grid.calculate_map_position(cursor_pos+cursor_offset)
 	#print(cursor_pos)
@@ -58,11 +64,14 @@ func _process(delta: float) -> void:
 		$ArrowMap.draw(current.cell, cursor_pos)
 	#print($Ground.local_to_map($CameraPivot/Camera3D.get_cursor_world_position()))
 	#print(occupied_tiles)
-func _flood_fill(cell: Vector3, max_distance: int) -> Array:
-	var array := []
+func _flood_fill(cell: Vector3, max_distance: int, atk: int) -> Dictionary:
+	#generate the instructions for the flood fill. 0 for standard movement, 1 for attack range
+	var fill_inst := {}
 	var queue := [cell]
 	var came_from := {}
 	var cost := {}
+	var range := []
+	var atk_range := []
 	
 	cost[cell] = max_distance
 	came_from[cell] = null
@@ -71,39 +80,82 @@ func _flood_fill(cell: Vector3, max_distance: int) -> Array:
 
 		if not grid.is_within_bounds(current):
 			continue
-		if current in array:
+		if current in range:
 			continue
 		if cost[current] < 0:
 			continue
 			
 		#cost system for pathfinding for future implementation with different cost terrains
 
-
-		array.append(current)
+		range.append(current)
 		for direction in DIRECTIONS:
 			var coordinates: Vector3 = current + direction
 			if is_occupied(coordinates):
+	# Enemy tile is attackable
 				continue
-			if coordinates in array:
+			if coordinates in range:
 				continue
 			if not came_from.has(coordinates):
 				cost[coordinates] = cost[current] - 1
 				came_from[coordinates] = current
 
 			queue.append(coordinates)
-	return array
+	queue = find_edge_tiles(range)
+	came_from = {}
+	for i in queue:
+		cost[i] = atk
+		came_from[i] = null
+	while not queue.is_empty():
+		var current = queue.pop_front()
+		if cost[current] < 0:
+			continue
+		if current in atk_range:
+			continue
+		if not grid.is_within_bounds(current):
+			continue
+			
+		atk_range.append(current)
+			
+		for dir in DIRECTIONS:
+			var next = current + dir
+
+			if not came_from.has(next):
+				cost[next] = cost[current] - 1
+				came_from[next] = current
+			queue.append(next)
+	for i in range:
+		fill_inst[i] = 0
+		atk_range.erase(i)
+	for i in atk_range:
+		fill_inst[i] = 1
+	return fill_inst
+	
+func find_edge_tiles(tiles: Array) -> Array:
+	var edges := []
+
+	for tile in tiles:
+		for dir in DIRECTIONS:
+			var neighbor = tile + dir
+			if not tiles.has(neighbor):
+				edges.append(tile)
+				break
+
+	return edges
 
 func select_unit_for_movement(cell: Vector3) -> void:
 	if cell != current.cell:
 		return
-	var points = _flood_fill(current.cell, current.action_points)
-	for i in points:
+	var fill_inst = _flood_fill(current.cell, current.action_points, current.atk_range)
+	var points := []
+	for i in fill_inst:
 		#await get_tree().create_timer(0.1).timeout 
-		$Overlay.set_cell_item(i, 0)
+		$Overlay.set_cell_item(i, fill_inst[i])
+		if fill_inst[i] == 0:
+			points.append(i)
 	$ArrowMap.initialise(points)
 	unit_selected_for_movement = true
 	
-func deselect_unit_for_movement(cell: Vector3) -> void:
+func deselect_unit_for_movement(cell:Vector3) -> void:
 	$ArrowMap.stop()
 	unit_selected_for_movement = false
 	$Overlay.clear()
@@ -112,12 +164,8 @@ func is_occupied(cell: Vector3) -> bool:
 	return is_occupied_by_unit(cell)
 	
 func is_occupied_by_unit(cell: Vector3) -> bool:
-	var occupied_tiles := []
 	
-	for i in queue:
-		occupied_tiles.append(i.cell)
-	
-	return cell in occupied_tiles
+	return cell in occupied_tiles.values()
 	
 func add_action(target, number):
 	target.action_points += number
@@ -143,9 +191,21 @@ func _input(event: InputEvent) -> void:
 		pivot.rotation.x -= event.relative.y / pivot.sensitivity
 		
 		pivot.rotation.x = clamp(pivot.rotation.x, -PI/4, PI/4)
-	
 	if event.is_action_pressed("left_click"):
-		if unit_selected_for_movement:
+		if attacking:
+			print("Attacking", cursor_pos, occupied_tiles)
+			print(cursor_pos in occupied_tiles)
+			if cursor_pos in occupied_tiles.values(): #check if cursor position is inside the occupied tiles
+				print("here")
+				var target = occupied_tiles.find_key(cursor_pos) #convert the cursor to the actual target
+				if target.is_in_group("Characters"):
+					current.attack(target)
+					$Overlay.clear()
+					attacking = false
+					print(target.hp)
+			
+			
+		elif unit_selected_for_movement:
 			if cursor_pos == current.cell:
 				deselect_unit_for_movement(cursor_pos)
 			else:
@@ -155,8 +215,6 @@ func _input(event: InputEvent) -> void:
 		else:
 			select_unit_for_movement(cursor_pos)
 			
-func attack(target) -> void:
-	pass
 
 
 func _on_signal_bus_action_done() -> void:
@@ -165,6 +223,7 @@ func _on_signal_bus_action_done() -> void:
 
 	var tile = grid.calculate_grid_coordinates(Vector3i(current.position.x, 0, current.position.z))
 	occupied_tiles[current] = tile
+	print(tile)
 	current = queue_in_action.pop_front()
 	current.initialise()
 	occupied_tiles[current] = null
@@ -172,8 +231,26 @@ func _on_signal_bus_action_done() -> void:
 	pivot.basis = current.basis
 	$CameraContainer.position = current._path_follow.global_position
 	$BattleUI.AP = current.action_points
+	$BattleUI.update_p_health(current.hp, current.max_hp)
+	print("new hp", current.hp)
 	
 
 
 func _on_signal_bus_walk_finished() -> void:
 	$BattleUI.AP = current.action_points
+
+
+func _on_battle_ui_attack() -> void:
+	#If i want to attack: first turn to attack mode, then select target
+	
+	if attacking:
+		$Overlay.clear()
+		attacking = false
+		print("atk off")
+	else:
+		var fill_inst = _flood_fill(current.cell, 0, current.atk_range)
+		for i in fill_inst:
+			#await get_tree().create_timer(0.1).timeout 
+			$Overlay.set_cell_item(i, fill_inst[i])
+		attacking = true
+		print("atk on")

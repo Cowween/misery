@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://bg6ed61lknyth"]
 
-[ext_resource type="Script" path="res://Scripts/battle_ui.gd" id="1_ij1wg"]
+[ext_resource type="Script" uid="uid://cyxcunk7lr1u0" path="res://Scripts/battle_ui.gd" id="1_ij1wg"]
 
 [node name="BattleUI" type="Control"]
 layout_mode = 3
@@ -33,6 +33,14 @@ offset_top = 34.0
 offset_right = -44.0
 offset_bottom = 71.0
 grow_horizontal = 0
+
+[node name="EnemyName" type="Label" parent="."]
+layout_mode = 0
+offset_left = 711.0
+offset_top = 40.0
+offset_right = 911.0
+offset_bottom = 63.0
+horizontal_alignment = 2
 
 [node name="VBoxContainer" type="VBoxContainer" parent="."]
 layout_mode = 1
@@ -69,4 +77,5 @@ text = "Attack"
 layout_mode = 2
 text = "Next Turn"
 
+[connection signal="pressed" from="HBoxContainer/Attack" to="." method="_on_attack_pressed"]
 [connection signal="pressed" from="HBoxContainer/Turn" to="." method="_on_turn_pressed"]

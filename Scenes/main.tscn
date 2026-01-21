@@ -1,17 +1,18 @@
-[gd_scene load_steps=15 format=3 uid="uid://bh6rlfkmh1ohi"]
+[gd_scene load_steps=16 format=3 uid="uid://bh6rlfkmh1ohi"]
 
 [ext_resource type="MeshLibrary" uid="uid://c6k5d3ajdptd5" path="res://Meshlib/tiles.tres" id="1_ct31n"]
-[ext_resource type="Script" path="res://Scripts/main.gd" id="1_w5nr3"]
-[ext_resource type="Script" path="res://Scripts/ground.gd" id="2_dq3d8"]
+[ext_resource type="Script" uid="uid://u0amuynrw07" path="res://Scripts/main.gd" id="1_w5nr3"]
+[ext_resource type="Script" uid="uid://cedti7dbgeds" path="res://Scripts/ground.gd" id="2_dq3d8"]
 [ext_resource type="PackedScene" uid="uid://dbgck5bxvyatv" path="res://Scenes/character.tscn" id="2_r85wr"]
 [ext_resource type="PackedScene" uid="uid://bg6ed61lknyth" path="res://Scenes/battle_ui.tscn" id="2_xer0r"]
-[ext_resource type="Script" path="res://Scripts/signal_bus.gd" id="5_3d4e3"]
+[ext_resource type="Script" uid="uid://bcptw4nvf8sgv" path="res://Scripts/signal_bus.gd" id="5_3d4e3"]
 [ext_resource type="PackedScene" uid="uid://cmiywraslxdps" path="res://Scenes/arrow.tscn" id="7_qwrnw"]
-[ext_resource type="Script" path="res://Scripts/camera_pivot.gd" id="7_wqngb"]
-[ext_resource type="Script" path="res://Scripts/camera_container.gd" id="8_t5d4i"]
-[ext_resource type="Script" path="res://Scripts/camera_3d.gd" id="8_ypjsh"]
+[ext_resource type="Script" uid="uid://lr40hdwjukyr" path="res://Scripts/camera_pivot.gd" id="7_wqngb"]
+[ext_resource type="Script" uid="uid://dnge58oejvwtm" path="res://Scripts/camera_container.gd" id="8_t5d4i"]
+[ext_resource type="Script" uid="uid://cmjo61jwbwm2" path="res://Scripts/camera_3d.gd" id="8_ypjsh"]
 [ext_resource type="MeshLibrary" uid="uid://di0mmlhw2675u" path="res://Meshlib/arrows.tres" id="9_ejrs7"]
-[ext_resource type="Script" path="res://Scripts/arrow_map.gd" id="10_bvv7k"]
+[ext_resource type="Script" uid="uid://xhogcsc4wkrl" path="res://Scripts/arrow_map.gd" id="10_bvv7k"]
+[ext_resource type="MeshLibrary" uid="uid://j00805tr5xyn" path="res://Meshlib/overlay.tres" id="10_wsu2k"]
 [ext_resource type="Resource" uid="uid://d2qkoqg3ttlpu" path="res://Resources/Grid.tres" id="11_l4201"]
 [ext_resource type="PackedScene" uid="uid://cqho3uyy7s34w" path="res://Scenes/cursor.tscn" id="12_bvaut"]
 
@@ -51,14 +52,7 @@ script = ExtResource("8_ypjsh")
 
 [node name="Overlay" type="GridMap" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 0)
-mesh_library = ExtResource("1_ct31n")
-
-[node name="ArrowMap" type="GridMap" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0)
-mesh_library = ExtResource("9_ejrs7")
-script = ExtResource("10_bvv7k")
-grid = ExtResource("11_l4201")
-metadata/_editor_floor_ = Vector3(0, 1, 0)
+mesh_library = ExtResource("10_wsu2k")
 
 [node name="Cursor" parent="." instance=ExtResource("12_bvaut")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.74361, 1.18289, -6.32617)
@@ -67,7 +61,23 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.74361, 1.18289, -6.32617)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.48616, 2.41666, 0)
 max_hp = 100
 initial_cell = Vector3(5, 0, 3)
+atk_range = 2
 
+[node name="Character2" parent="." instance=ExtResource("2_r85wr")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.124868, 2.267197, 4.0011683)
+max_hp = 100
+initial_cell = Vector3(3, 0, 0)
+atk_range = 2
+cname = "P2"
+
+[node name="ArrowMap" type="GridMap" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0)
+mesh_library = ExtResource("9_ejrs7")
+script = ExtResource("10_bvv7k")
+grid = ExtResource("11_l4201")
+metadata/_editor_floor_ = Vector3(0, 1, 0)
+
+[connection signal="attack" from="BattleUI" to="." method="_on_battle_ui_attack"]
 [connection signal="next_turn" from="BattleUI" to="SignalBus" method="_on_battle_ui_next_turn"]
 [connection signal="action_done" from="SignalBus" to="." method="_on_signal_bus_action_done"]
 [connection signal="walk_finished" from="SignalBus" to="." method="_on_signal_bus_walk_finished"]

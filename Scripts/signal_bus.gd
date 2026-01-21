@@ -1,7 +1,6 @@
 extends Node
 
 signal action_done
-signal attacking(attacker, target, damage)
 signal walk_finished
 
 # Called when the node enters the scene tree for the first time.

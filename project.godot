@@ -23,6 +23,10 @@ version_control/autoload_on_startup=true
 
 enabled=PackedStringArray()
 
+[global_group]
+
+Enemy=""
+
 [input]
 
 move_forward={

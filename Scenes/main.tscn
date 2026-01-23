@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=3 uid="uid://bh6rlfkmh1ohi"]
+[gd_scene load_steps=17 format=3 uid="uid://bh6rlfkmh1ohi"]
 
 [ext_resource type="MeshLibrary" uid="uid://c6k5d3ajdptd5" path="res://Meshlib/tiles.tres" id="1_ct31n"]
 [ext_resource type="Script" uid="uid://u0amuynrw07" path="res://Scripts/main.gd" id="1_w5nr3"]
@@ -15,6 +15,7 @@
 [ext_resource type="MeshLibrary" uid="uid://j00805tr5xyn" path="res://Meshlib/overlay.tres" id="10_wsu2k"]
 [ext_resource type="Resource" uid="uid://d2qkoqg3ttlpu" path="res://Resources/Grid.tres" id="11_l4201"]
 [ext_resource type="PackedScene" uid="uid://cqho3uyy7s34w" path="res://Scenes/cursor.tscn" id="12_bvaut"]
+[ext_resource type="PackedScene" uid="uid://b0lk2eq12oie" path="res://Scenes/player_character.tscn" id="16_k12tt"]
 
 [node name="Main" type="Node"]
 script = ExtResource("1_w5nr3")
@@ -76,6 +77,11 @@ mesh_library = ExtResource("9_ejrs7")
 script = ExtResource("10_bvv7k")
 grid = ExtResource("11_l4201")
 metadata/_editor_floor_ = Vector3(0, 1, 0)
+
+[node name="Character3" parent="." instance=ExtResource("16_k12tt")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.939037, 2.2671964, 6.054259)
+initial_cell = Vector3(5, 0, 0)
+cname = "Edith"
 
 [connection signal="attack" from="BattleUI" to="." method="_on_battle_ui_attack"]
 [connection signal="next_turn" from="BattleUI" to="SignalBus" method="_on_battle_ui_next_turn"]

@@ -211,13 +211,13 @@ func _input(event: InputEvent) -> void:
 		
 		pivot.rotation.x = clamp(pivot.rotation.x, -PI/4, PI/4)
 	if event.is_action_pressed("left_click"):
-		if attacking:
+		if attacking: #attack mode triggered by either pressing attack or pressing on a hostile square
 			print("Attacking", cursor_pos, occupied_tiles)
 			print(cursor_pos in occupied_tiles)
 			if cursor_pos in attack_zone and cursor_pos in occupied_tiles.values(): #check if cursor position is inside the occupied tiles
 				print("here")
 				var target = occupied_tiles.find_key(cursor_pos) #convert the cursor to the actual target
-				if target.is_in_group("Characters"):
+				if target.is_in_group("Characters"): #checl for groups here
 					current.attack(target)
 					$Overlay.clear()
 					attacking = false
@@ -230,7 +230,7 @@ func _input(event: InputEvent) -> void:
 			else:
 				print(attack_zone)
 				print(cursor_pos)
-				if cursor_pos in attack_zone && occupied_tiles.find_key(cursor_pos).is_in_group("Characters"):
+				if cursor_pos in attack_zone && occupied_tiles.values().has(cursor_pos) and occupied_tiles.find_key(cursor_pos).is_in_group("Characters"):
 					attack_after_walk = true
 					print("Attacking after walk")
 					

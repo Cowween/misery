@@ -1,4 +1,4 @@
-@tool
+class_name Character
 extends Path3D
 
 @export var speed = 5
@@ -63,8 +63,10 @@ func _process(delta: float) -> void:
 		# curve.
 		# In the process loop, we only moved the sprite, and not the unit itself. The following
 		# lines move the unit in a way that's transparent to the player.
+		#var cached_rot = _path_follow.rotation
 		_path_follow.progress = 0.0
 		position = grid.calculate_map_position(cell+offset)
+		#_path_follow.rotation = cached_rot
 		_path_follow.position = Vector3(0,0,0)
 		action_points = walking_ap
 

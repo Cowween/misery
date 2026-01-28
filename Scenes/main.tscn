@@ -1,11 +1,11 @@
-[gd_scene load_steps=17 format=3 uid="uid://bh6rlfkmh1ohi"]
+[gd_scene load_steps=19 format=3 uid="uid://bh6rlfkmh1ohi"]
 
 [ext_resource type="MeshLibrary" uid="uid://c6k5d3ajdptd5" path="res://Meshlib/tiles.tres" id="1_ct31n"]
 [ext_resource type="Script" uid="uid://u0amuynrw07" path="res://Scripts/main.gd" id="1_w5nr3"]
 [ext_resource type="Script" uid="uid://cedti7dbgeds" path="res://Scripts/ground.gd" id="2_dq3d8"]
 [ext_resource type="PackedScene" uid="uid://dbgck5bxvyatv" path="res://Scenes/character.tscn" id="2_r85wr"]
-[ext_resource type="PackedScene" uid="uid://bg6ed61lknyth" path="res://Scenes/battle_ui.tscn" id="2_xer0r"]
-[ext_resource type="Script" uid="uid://bcptw4nvf8sgv" path="res://Scripts/signal_bus.gd" id="5_3d4e3"]
+[ext_resource type="PackedScene" uid="uid://bg6ed61lknyth" path="res://Scenes/UI/battle_ui.tscn" id="2_xer0r"]
+[ext_resource type="PackedScene" uid="uid://so21sg3rx54y" path="res://Scenes/signal_bus.tscn" id="4_b3802"]
 [ext_resource type="PackedScene" uid="uid://cmiywraslxdps" path="res://Scenes/arrow.tscn" id="7_qwrnw"]
 [ext_resource type="Script" uid="uid://lr40hdwjukyr" path="res://Scripts/camera_pivot.gd" id="7_wqngb"]
 [ext_resource type="Script" uid="uid://dnge58oejvwtm" path="res://Scripts/camera_container.gd" id="8_t5d4i"]
@@ -15,12 +15,12 @@
 [ext_resource type="MeshLibrary" uid="uid://j00805tr5xyn" path="res://Meshlib/overlay.tres" id="10_wsu2k"]
 [ext_resource type="Resource" uid="uid://d2qkoqg3ttlpu" path="res://Resources/Grid.tres" id="11_l4201"]
 [ext_resource type="PackedScene" uid="uid://cqho3uyy7s34w" path="res://Scenes/cursor.tscn" id="12_bvaut"]
-[ext_resource type="PackedScene" uid="uid://b0lk2eq12oie" path="res://Scenes/player_character.tscn" id="16_k12tt"]
+[ext_resource type="PackedScene" uid="uid://pa4cgay4kwro" path="res://Scenes/Attacks/heavy attack.tscn" id="12_fevyy"]
+[ext_resource type="PackedScene" uid="uid://col4orb8a3y68" path="res://Scenes/Attacks/slash.tscn" id="13_hibaj"]
+[ext_resource type="PackedScene" uid="uid://j1bpwip3x252" path="res://Scenes/UI/attack_interface.tscn" id="16_k12tt"]
 
 [node name="Main" type="Node"]
 script = ExtResource("1_w5nr3")
-
-[node name="BattleUI" parent="." instance=ExtResource("2_xer0r")]
 
 [node name="Ground" type="GridMap" parent="."]
 mesh_library = ExtResource("1_ct31n")
@@ -30,8 +30,7 @@ data = {
 script = ExtResource("2_dq3d8")
 metadata/_editor_floor_ = Vector3(0, 0, 0)
 
-[node name="SignalBus" type="Node" parent="."]
-script = ExtResource("5_3d4e3")
+[node name="SignalBus" parent="." instance=ExtResource("4_b3802")]
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 0.869219, 0.494427, 0, -0.494427, 0.869219, -5.1178, 2.8578, 2.19359)
@@ -58,18 +57,26 @@ mesh_library = ExtResource("10_wsu2k")
 [node name="Cursor" parent="." instance=ExtResource("12_bvaut")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.74361, 1.18289, -6.32617)
 
-[node name="Character" parent="." instance=ExtResource("2_r85wr")]
+[node name="Character" parent="." node_paths=PackedStringArray("attack_abilities") instance=ExtResource("2_r85wr")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.48616, 2.41666, 0)
-max_hp = 100
 initial_cell = Vector3(5, 0, 3)
-atk_range = 2
+option_menu_offset = Vector2(100, -100)
+attack_abilities = [NodePath("HeavyAttack"), NodePath("Slash")]
 
-[node name="Character2" parent="." instance=ExtResource("2_r85wr")]
+[node name="HeavyAttack" parent="Character" instance=ExtResource("12_fevyy")]
+
+[node name="Slash" parent="Character" instance=ExtResource("13_hibaj")]
+
+[node name="Character2" parent="." node_paths=PackedStringArray("attack_abilities") instance=ExtResource("2_r85wr")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.124868, 2.267197, 4.0011683)
-max_hp = 100
 initial_cell = Vector3(3, 0, 0)
-atk_range = 2
 cname = "P2"
+option_menu_offset = Vector2(100, -100)
+attack_abilities = [NodePath("Slash"), NodePath("HeavyAttack")]
+
+[node name="Slash" parent="Character2" instance=ExtResource("13_hibaj")]
+
+[node name="HeavyAttack" parent="Character2" instance=ExtResource("12_fevyy")]
 
 [node name="ArrowMap" type="GridMap" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0)
@@ -78,12 +85,30 @@ script = ExtResource("10_bvv7k")
 grid = ExtResource("11_l4201")
 metadata/_editor_floor_ = Vector3(0, 1, 0)
 
-[node name="Character3" parent="." instance=ExtResource("16_k12tt")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.939037, 2.2671964, 6.054259)
-initial_cell = Vector3(5, 0, 0)
-cname = "Edith"
+[node name="UI elements" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = 2.0
+offset_bottom = 4.0
+grow_horizontal = 2
+grow_vertical = 2
 
-[connection signal="attack" from="BattleUI" to="." method="_on_battle_ui_attack"]
-[connection signal="next_turn" from="BattleUI" to="SignalBus" method="_on_battle_ui_next_turn"]
+[node name="BattleUI" parent="UI elements" instance=ExtResource("2_xer0r")]
+layout_mode = 1
+
+[node name="attack_interface" parent="UI elements" node_paths=PackedStringArray("camera", "SignalBus") instance=ExtResource("16_k12tt")]
+layout_mode = 1
+offset_left = 628.0
+offset_top = -50.0
+offset_right = 837.0
+offset_bottom = 135.0
+camera = NodePath("../../CameraContainer/CameraPivot/Camera3D")
+SignalBus = NodePath("../../SignalBus")
+
 [connection signal="action_done" from="SignalBus" to="." method="_on_signal_bus_action_done"]
+[connection signal="atk_pressed" from="SignalBus" to="." method="_on_signal_bus_atk_pressed"]
 [connection signal="walk_finished" from="SignalBus" to="." method="_on_signal_bus_walk_finished"]
+[connection signal="attack" from="UI elements/BattleUI" to="." method="_on_battle_ui_attack"]
+[connection signal="next_turn" from="UI elements/BattleUI" to="SignalBus" method="_on_battle_ui_next_turn"]

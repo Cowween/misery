@@ -2,6 +2,9 @@ extends Node
 
 signal action_done
 signal walk_finished
+signal ap_update(value:int)
+signal hp_update(value:int)
+signal atk_pressed(atk_id: int)
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:

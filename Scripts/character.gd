@@ -11,6 +11,8 @@ extends Path3D
 @export var atk_range := 2
 @export var atk := 3
 @export var cname := "P1"
+@export var option_menu_offset := Vector2(10,10)
+@export var attack_abilities : Array[Ability] = []
 
 var SignalBus: Node
 var cell := Vector3.ZERO: set = set_cell
@@ -18,13 +20,17 @@ var tile_over = true
 var initiative = randi_range(0,11)
 var current_basis = Vector3()
 var is_walking = false : set = set_is_walking
-var hp = max_hp
+var hp = max_hp: set =set_hp
 var walking_ap := 0
 
 @onready var _path_follow = $PathFollow3D
 
 func set_cell(value: Vector3) -> void:
 	cell = grid.clamp(value)
+	
+func set_hp(value: int) -> void:
+	hp = value
+	SignalBus.hp_update.emit(value)
 	
 func set_is_walking(value: bool) -> void:
 	is_walking = value
@@ -33,6 +39,7 @@ func set_is_walking(value: bool) -> void:
 func set_action_points(value: int) -> void:
 	action_points = value
 	print(cname, "ap", value)
+	SignalBus.ap_update.emit(value)
 	if action_points == 0:
 		SignalBus.action_done.emit()
 	
@@ -41,7 +48,8 @@ func initialise() -> void:
 
 func _ready() -> void:
 	
-	
+	for i in attack_abilities:
+		i.ability_owner = self
 	cell = initial_cell
 	position = grid.calculate_map_position(cell) + offset
 	_path_follow.progress = 0.0
@@ -63,10 +71,10 @@ func _process(delta: float) -> void:
 		# curve.
 		# In the process loop, we only moved the sprite, and not the unit itself. The following
 		# lines move the unit in a way that's transparent to the player.
-		#var cached_rot = _path_follow.rotation
+		var cached_rot = _path_follow.rotation
 		_path_follow.progress = 0.0
 		position = grid.calculate_map_position(cell+offset)
-		#_path_follow.rotation = cached_rot
+		_path_follow.rotation = cached_rot
 		_path_follow.position = Vector3(0,0,0)
 		action_points = walking_ap
 
@@ -96,8 +104,7 @@ func walk_along(path: PackedVector3Array) -> void:
 	# `_set_is_walking()` below.
 	is_walking = true
 		
-func attack(target) -> void:
+func attack(target: Character, abilityID: int) -> void:
 	#For attack, you pass a character object through the target and deduct its hp
-	target.hp -= atk
-	pass
+	attack_abilities[abilityID].execute(target)
 	

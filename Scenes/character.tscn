@@ -16,7 +16,6 @@ loop = false
 tilt_enabled = false
 
 [node name="CharacterBody3D" type="StaticBody3D" parent="PathFollow3D"]
-transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 0, 0, 0)
 
 [node name="Character" parent="PathFollow3D/CharacterBody3D" instance=ExtResource("2_x3y0s")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.02016, 0)

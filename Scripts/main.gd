@@ -5,26 +5,35 @@ const DIRECTIONS = [Vector3.LEFT, Vector3.RIGHT, Vector3.FORWARD, Vector3.BACK]
 @export var grid : Resource = preload("res://Resources/Grid.tres")
 @export var cursor_offset := Vector3(0,1,0)
 
-@onready var camera = $CameraContainer/CameraPivot/Camera3D
-@onready var pivot = $CameraContainer/CameraPivot
 
-var occupied_tiles = {} #occupied_tiles stores a dictionary with a whatever object as a key, and its coordinates as the value
+@onready var camera := $CameraContainer/CameraPivot/Camera3D
+@onready var pivot := $CameraContainer/CameraPivot
+@onready var battle_ui := $"UI elements/BattleUI"
+@onready var attack_interface := $"UI elements/attack_interface"
+
+var occupied_tiles := {} #occupied_tiles stores a dictionary with a whatever object as a key, and its coordinates as the value
 #initiative
-var queue = []
-var queue_in_action = []
-var current
-var dragging = false
-var unit_selected_for_movement = false
-var cursor_pos = Vector3()
-var attacking := false
+var queue := []
+var queue_in_action := []
+var current : Character
+var dragging := false
+var unit_selected_for_movement := false
+var cursor_pos := Vector3()
+var last_cursor_position := Vector3()
+var attacking := false :set = set_attacking #turn on the attacking interface if set true
 var attack_zone := []
 var attack_after_walk := false
+var current_target : Character
+
+
+#==setters==
+func set_attacking(value: bool) -> void:
+	attacking = value
+	attack_mode(value)
 
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	
-	
 	
 	#Initiative
 	queue = get_tree().get_nodes_in_group("Characters")
@@ -35,8 +44,8 @@ func _ready() -> void:
 	queue_in_action = queue.duplicate()
 	current = queue_in_action.pop_front()
 	occupied_tiles[current] = null
-	$BattleUI.AP = current.action_points
-	$BattleUI.update_p_health(current.max_hp, current.hp)
+	battle_ui.update_ap(current.action_points)
+	battle_ui.update_p_health(current.max_hp, current.hp)
 	
 	#var points = _flood_fill(current.cell, current.action_points)
 	#print(current.cell)
@@ -47,6 +56,7 @@ func _ready() -> void:
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
+	
 	if Input.is_action_just_pressed("ui_accept"):
 		add_action($Character, 4)
 	$Arrow.target = current._path_follow
@@ -54,9 +64,9 @@ func _process(delta: float) -> void:
 	cursor_pos = grid.clamp(cursor_pos)
 	if cursor_pos in occupied_tiles.values():
 		var target = occupied_tiles.find_key(cursor_pos)
-		$BattleUI.display_enemy_info(target.cname, target.hp, target.max_hp) #display the stats of the target
+		battle_ui.display_enemy_info(target.cname, target.hp, target.max_hp) #display the stats of the target
 	else:
-		$BattleUI.hide_enemy_info()
+		battle_ui.hide_enemy_info()
 	#print(occupied_tiles)
 	$Cursor.position = grid.calculate_map_position(cursor_pos+cursor_offset)
 	#print(cursor_pos)
@@ -177,7 +187,7 @@ func select_unit_for_movement(cell: Vector3) -> void:
 func deselect_unit_for_movement(cell:Vector3) -> void:
 	$ArrowMap.stop()
 	unit_selected_for_movement = false
-	$Overlay.clear()
+	attacking=false
 	
 func is_occupied(cell: Vector3) -> bool:
 	return is_occupied_by_unit(cell)
@@ -214,14 +224,7 @@ func _input(event: InputEvent) -> void:
 		if attacking: #attack mode triggered by either pressing attack or pressing on a hostile square
 			print("Attacking", cursor_pos, occupied_tiles)
 			print(cursor_pos in occupied_tiles)
-			if cursor_pos in attack_zone and cursor_pos in occupied_tiles.values(): #check if cursor position is inside the occupied tiles
-				print("here")
-				var target = occupied_tiles.find_key(cursor_pos) #convert the cursor to the actual target
-				if target.is_in_group("Characters"): #checl for groups here
-					current.attack(target)
-					$Overlay.clear()
-					attacking = false
-					print(target.hp)
+			target_mode(cursor_pos)
 			
 			
 		elif unit_selected_for_movement:
@@ -232,6 +235,7 @@ func _input(event: InputEvent) -> void:
 				print(cursor_pos)
 				if cursor_pos in attack_zone && occupied_tiles.values().has(cursor_pos) and occupied_tiles.find_key(cursor_pos).is_in_group("Characters"):
 					attack_after_walk = true
+					last_cursor_position = cursor_pos
 					print("Attacking after walk")
 					
 				current.walk_along($ArrowMap.current_path)
@@ -240,14 +244,28 @@ func _input(event: InputEvent) -> void:
 		else:
 			select_unit_for_movement(cursor_pos)
 			
-func attack_mode() -> void:
-	var fill_inst = _flood_fill(current.cell, 0, current.atk_range)
-	for i in fill_inst:
-			#await get_tree().create_timer(0.1).timeout 
-		$Overlay.set_cell_item(i, fill_inst[i])
+func attack_mode(is_attack_mode:bool) -> void:
+	if is_attack_mode:
+		var fill_inst = _flood_fill(current.cell, 0, current.atk_range)
+		for i in fill_inst:
+				#await get_tree().create_timer(0.1).timeout 
+			$Overlay.set_cell_item(i, fill_inst[i])
+	else:
+		$Overlay.clear()
+		attack_interface.hide_attacks()
+	
+func target_mode(target_coordinates: Vector3) -> void:
+	if not (target_coordinates in attack_zone and target_coordinates in occupied_tiles.values()):
+		return
+	var target = occupied_tiles.find_key(target_coordinates) #convert the cursor to the actual target
+	if target.is_in_group("Characters"): #checl for groups here
+		current_target = target
+		attack_interface.display_attacks(target, current)
+	
 	
 
 func _on_signal_bus_action_done() -> void:
+	attacking = false
 	if queue_in_action.size() == 0:
 		queue_in_action = queue.duplicate()
 
@@ -260,28 +278,34 @@ func _on_signal_bus_action_done() -> void:
 	current.current_basis = current.transform.basis
 	pivot.basis = current.basis
 	$CameraContainer.position = current._path_follow.global_position
-	$BattleUI.AP = current.action_points
-	$BattleUI.update_p_health(current.hp, current.max_hp)
+	#battle_ui.AP = current.action_points
+	battle_ui.update_p_health(current.hp, current.max_hp)
 	print("new hp", current.hp)
 	
 
 
 func _on_signal_bus_walk_finished() -> void:
-	$BattleUI.AP = current.action_points
+	#battle_ui.update_ap(current.action_points)
 	if attack_after_walk:
+		print("Here")
 		attack_after_walk = false
+		target_mode(last_cursor_position)
 		attacking = true
-		attack_mode()
 
 
 func _on_battle_ui_attack() -> void:
 	#If i want to attack: first turn to attack mode, then select target
 	
 	if attacking:
-		$Overlay.clear()
 		attacking = false
 		print("atk off")
 	else:
-		attack_mode()
 		attacking = true
 		print("atk on")
+
+
+func _on_signal_bus_atk_pressed(atk_id: int) -> void:
+	current.attack(current_target, atk_id)
+	attack_interface.hide_attacks()
+	attacking = false
+	

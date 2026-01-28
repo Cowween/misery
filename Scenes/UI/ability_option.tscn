@@ -1,0 +1,9 @@
+[gd_scene load_steps=2 format=3 uid="uid://ce82pnvqf3agw"]
+
+[ext_resource type="Script" uid="uid://b8jcegom7wbh4" path="res://Scripts/ability_option.gd" id="1_qmico"]
+
+[node name="AbilityOption" type="Button"]
+text = "Button 1"
+script = ExtResource("1_qmico")
+
+[connection signal="pressed" from="." to="." method="_on_pressed"]

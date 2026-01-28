@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3 uid="uid://pa4cgay4kwro"]
+
+[ext_resource type="Script" uid="uid://cu6xcop6b5jg0" path="res://Scripts/heavy_attack.gd" id="1_xvajp"]
+
+[node name="HeavyAttack" type="Node"]
+script = ExtResource("1_xvajp")
+atk_multiplier = 2
+ability_name = "Heavy Attack"

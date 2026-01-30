@@ -67,18 +67,13 @@ func _process(delta: float) -> void:
 		battle_ui.display_enemy_info(target.cname, target.hp, target.max_hp) #display the stats of the target
 	else:
 		battle_ui.hide_enemy_info()
-	#print(occupied_tiles)
 	$Cursor.position = grid.calculate_map_position(cursor_pos+cursor_offset)
-	#print(cursor_pos)
-	#print($Cursor.position)
-	#print(current_pos, target_pos)
 	if unit_selected_for_movement:
 		var nearest_no_occupy = cursor_pos
 		if is_occupied(cursor_pos):
 			nearest_no_occupy = get_nearest_surrounding_tile(current.cell, cursor_pos)
 		$ArrowMap.draw(current.cell, nearest_no_occupy, current.action_points)
-	#print($Ground.local_to_map($CameraPivot/Camera3D.get_cursor_world_position()))
-	#print(occupied_tiles)
+		
 func _flood_fill(cell: Vector3, max_distance: int, atk: int) -> Dictionary:
 	#generate the instructions for the flood fill. 0 for standard movement, 1 for attack range
 	var fill_inst := {}
@@ -237,9 +232,16 @@ func _input(event: InputEvent) -> void:
 					attack_after_walk = true
 					last_cursor_position = cursor_pos
 					print("Attacking after walk")
-					
-				current.walk_along($ArrowMap.current_path)
-				deselect_unit_for_movement(cursor_pos)
+				if not $ArrowMap.current_path.size() <= 1:
+					current.walk_along($ArrowMap.current_path)
+					deselect_unit_for_movement(cursor_pos)
+				elif attack_after_walk:
+					deselect_unit_for_movement(cursor_pos)
+					print("here")
+					attack_after_walk = false
+					target_mode(last_cursor_position)
+					attacking = true
+				
 				
 		else:
 			select_unit_for_movement(cursor_pos)

@@ -2,7 +2,6 @@ class_name Character
 extends Path3D
 
 @export var speed = 5
-@export var action_points = 5: set = set_action_points
 @export var ap_per_turn = 5
 @export var max_hp = 100
 @export var grid: Resource = preload("res://Resources/Grid.tres")
@@ -14,6 +13,7 @@ extends Path3D
 @export var option_menu_offset := Vector2(10,10)
 @export var attack_abilities : Array[Ability] = []
 
+var action_points = 5: set = set_action_points
 var SignalBus: Node
 var cell := Vector3.ZERO: set = set_cell
 var tile_over = true
@@ -42,6 +42,8 @@ func set_action_points(value: int) -> void:
 	SignalBus.ap_update.emit(value)
 	if action_points == 0:
 		SignalBus.action_done.emit()
+	
+	
 	
 func initialise() -> void:
 	action_points = ap_per_turn
@@ -106,5 +108,8 @@ func walk_along(path: PackedVector3Array) -> void:
 		
 func attack(target: Character, abilityID: int) -> void:
 	#For attack, you pass a character object through the target and deduct its hp
+	_path_follow.look_at(target.position, Vector3(0,1,0), true)
 	attack_abilities[abilityID].execute(target)
+	print("AP cost: ", attack_abilities[abilityID].ap_cost)
+	action_points = action_points - attack_abilities[abilityID].ap_cost
 	

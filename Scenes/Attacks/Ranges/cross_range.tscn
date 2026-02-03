@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://dp1qvkycbypxt"]
+
+[ext_resource type="Script" uid="uid://ds3oq3kkjk012" path="res://Scripts/cross_range.gd" id="1_3dbom"]
+
+[node name="CrossRange" type="Node" unique_id=2145944159]
+script = ExtResource("1_3dbom")

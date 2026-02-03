@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://d1rnbv0ivc3hu"]
+
+[ext_resource type="Script" uid="uid://vr0iroh67vy0" path="res://Scripts/cone_range.gd" id="1_fps73"]
+
+[node name="ConeRange" type="Node" unique_id=1514438347]
+script = ExtResource("1_fps73")

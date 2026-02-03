@@ -35,6 +35,7 @@ func set_attacking(value: bool) -> void:
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	
+	
 	#Initiative
 	queue = get_tree().get_nodes_in_group("Characters")
 	queue.sort_custom(sort_queue)
@@ -52,6 +53,12 @@ func _ready() -> void:
 	#$ArrowMap.initialise(points)
 	$CameraContainer.position  = current.position
 	pivot.basis = current.basis
+	
+	#==test==
+	#$DiamondRange.actor = current
+	#$DiamondRange.grid = grid
+	#for i in $DiamondRange.get_tiles_in_range():
+	#	$Overlay.set_cell_item(i, 1)
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.

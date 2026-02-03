@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://db1knfwyv5ukh"]
+
+[ext_resource type="Script" uid="uid://dfkba45wq41hm" path="res://Scripts/diamond_range.gd" id="1_ncoem"]
+
+[node name="DiamondRange" type="Node" unique_id=1447504178]
+script = ExtResource("1_ncoem")

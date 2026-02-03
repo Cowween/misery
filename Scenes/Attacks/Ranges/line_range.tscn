@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://2sd4xd8dwyu1"]
+
+[ext_resource type="Script" uid="uid://b5fdao7eormpa" path="res://Scripts/line_range.gd" id="1_2wfn2"]
+
+[node name="LineRange" type="Node" unique_id=1749515746]
+script = ExtResource("1_2wfn2")

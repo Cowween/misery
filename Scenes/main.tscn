@@ -5,7 +5,7 @@
 [ext_resource type="Script" uid="uid://cedti7dbgeds" path="res://Scripts/ground.gd" id="2_dq3d8"]
 [ext_resource type="PackedScene" uid="uid://dbgck5bxvyatv" path="res://Scenes/character.tscn" id="2_r85wr"]
 [ext_resource type="PackedScene" uid="uid://bg6ed61lknyth" path="res://Scenes/UI/battle_ui.tscn" id="2_xer0r"]
-[ext_resource type="PackedScene" uid="uid://so21sg3rx54y" path="res://Scenes/signal_bus.tscn" id="4_b3802"]
+[ext_resource type="PackedScene" path="res://Scenes/signal_bus.tscn" id="4_b3802"]
 [ext_resource type="PackedScene" uid="uid://cmiywraslxdps" path="res://Scenes/arrow.tscn" id="7_qwrnw"]
 [ext_resource type="Script" uid="uid://lr40hdwjukyr" path="res://Scripts/camera_pivot.gd" id="7_wqngb"]
 [ext_resource type="Script" uid="uid://dnge58oejvwtm" path="res://Scripts/camera_container.gd" id="8_t5d4i"]

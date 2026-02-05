@@ -1,17 +1,21 @@
-[gd_scene load_steps=2 format=3 uid="uid://bg6ed61lknyth"]
+[gd_scene format=3 uid="uid://bg6ed61lknyth"]
 
 [ext_resource type="Script" uid="uid://cyxcunk7lr1u0" path="res://Scripts/battle_ui.gd" id="1_ij1wg"]
 
-[node name="BattleUI" type="Control"]
+[node name="BattleUI" type="Control" unique_id=1347659441]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+offset_left = 200.0
+offset_top = 48.0
+offset_right = 200.0
+offset_bottom = 48.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_ij1wg")
 
-[node name="PlayerInfo" type="VBoxContainer" parent="."]
+[node name="PlayerInfo" type="VBoxContainer" parent="." unique_id=14319706]
 layout_mode = 1
 anchors_preset = 2
 anchor_top = 1.0
@@ -22,23 +26,23 @@ offset_right = 278.0
 offset_bottom = -127.0
 grow_vertical = 0
 
-[node name="AP" type="Label" parent="PlayerInfo"]
+[node name="AP" type="Label" parent="PlayerInfo" unique_id=1866597355]
 layout_mode = 2
 text = "AP:"
 
-[node name="HBoxContainer" type="HBoxContainer" parent="PlayerInfo"]
+[node name="HBoxContainer" type="HBoxContainer" parent="PlayerInfo" unique_id=550865808]
 layout_mode = 2
 
-[node name="HP" type="Label" parent="PlayerInfo/HBoxContainer"]
+[node name="HP" type="Label" parent="PlayerInfo/HBoxContainer" unique_id=932054250]
 layout_mode = 2
 text = "HP:"
 
-[node name="PlayerBar" type="ProgressBar" parent="PlayerInfo/HBoxContainer"]
+[node name="PlayerBar" type="ProgressBar" parent="PlayerInfo/HBoxContainer" unique_id=1410393672]
 layout_mode = 2
 size_flags_horizontal = 3
 value = 100.0
 
-[node name="HBoxContainer" type="HBoxContainer" parent="."]
+[node name="HBoxContainer" type="HBoxContainer" parent="." unique_id=1809582399]
 layout_mode = 1
 anchors_preset = 2
 anchor_top = 1.0
@@ -47,18 +51,19 @@ offset_left = 45.0
 offset_top = -99.0
 offset_right = 218.385
 offset_bottom = -57.0
+grow_vertical = 0
 theme_override_constants/separation = 5
 
-[node name="Attack" type="Button" parent="HBoxContainer"]
+[node name="Attack" type="Button" parent="HBoxContainer" unique_id=996881734]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Attack"
 
-[node name="Turn" type="Button" parent="HBoxContainer"]
+[node name="Turn" type="Button" parent="HBoxContainer" unique_id=2050268359]
 layout_mode = 2
 text = "Next Turn"
 
-[node name="EnemyInfo" type="HBoxContainer" parent="."]
+[node name="EnemyInfo" type="HBoxContainer" parent="." unique_id=736185309]
 layout_mode = 1
 anchors_preset = 1
 anchor_left = 1.0
@@ -70,12 +75,12 @@ offset_bottom = 45.0
 grow_horizontal = 0
 metadata/_edit_group_ = true
 
-[node name="EnemyName" type="Label" parent="EnemyInfo"]
+[node name="EnemyName" type="Label" parent="EnemyInfo" unique_id=52491663]
 layout_mode = 2
 text = "Enemy name"
 horizontal_alignment = 2
 
-[node name="EnemyBar" type="ProgressBar" parent="EnemyInfo"]
+[node name="EnemyBar" type="ProgressBar" parent="EnemyInfo" unique_id=1804124889]
 layout_mode = 2
 size_flags_horizontal = 3
 

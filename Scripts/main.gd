@@ -24,6 +24,7 @@ var attacking := false :set = set_attacking #turn on the attacking interface if 
 var attack_zone := []
 var attack_after_walk := false
 var current_target : Character
+var is_aiming := false
 
 
 #==setters==
@@ -80,6 +81,7 @@ func _process(delta: float) -> void:
 		if is_occupied(cursor_pos):
 			nearest_no_occupy = get_nearest_surrounding_tile(current.cell, cursor_pos)
 		$ArrowMap.draw(current.cell, nearest_no_occupy, current.action_points)
+	character_aiming(is_aiming)
 		
 func _flood_fill(cell: Vector3, max_distance: int, atk: int) -> Dictionary:
 	#generate the instructions for the flood fill. 0 for standard movement, 1 for attack range
@@ -173,6 +175,11 @@ func get_nearest_surrounding_tile(start: Vector3, end: Vector3) -> Vector3:
 			dist = start.distance_to(temp)
 	return result
 
+func paint_overlay(cells: Array[Vector3], cell_id: int):
+	$Overlay.clear()
+	for i in cells:
+		$Overlay.set_cell_item(i, cell_id)
+
 func select_unit_for_movement(cell: Vector3) -> void:
 	if cell != current.cell:
 		return
@@ -263,14 +270,22 @@ func attack_mode(is_attack_mode:bool) -> void:
 		$Overlay.clear()
 		attack_interface.hide_attacks()
 	
-func target_mode(target_coordinates: Vector3) -> void:
+func target_mode(target_coordinates: Vector3) -> void: #target mode displays the available actions next to the target
 	if not (target_coordinates in attack_zone and target_coordinates in occupied_tiles.values()):
 		return
 	var target = occupied_tiles.find_key(target_coordinates) #convert the cursor to the actual target
-	if target.is_in_group("Characters"): #checl for groups here
+	if target.is_in_group("Characters"): #check for groups here
 		current_target = target
 		attack_interface.display_attacks(target, current)
-	
+
+func character_aiming(is_aiming: bool) -> void:
+	if is_aiming:
+		var tile = get_nearest_surrounding_tile(cursor_pos, current.cell)
+		current._path_follow.look_at(grid.calculate_map_position(tile), Vector3(0,1,0), true)
+		current._path_follow.rotation.x = 0
+		current._path_follow.rotation.z = 0
+	else:
+		return
 	
 
 func _on_signal_bus_action_done() -> void:

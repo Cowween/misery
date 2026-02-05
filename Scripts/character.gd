@@ -1,6 +1,8 @@
 class_name Character
 extends Path3D
 
+const DIRECTIONS = [Vector3.LEFT, Vector3.RIGHT, Vector3.FORWARD, Vector3.BACK]
+
 @export var speed = 5
 @export var ap_per_turn = 5
 @export var max_hp = 100
@@ -22,8 +24,10 @@ var current_basis = Vector3()
 var is_walking = false : set = set_is_walking
 var hp = max_hp: set =set_hp
 var walking_ap := 0
+var adrenaline := 0
 
 @onready var _path_follow = $PathFollow3D
+		
 
 func set_cell(value: Vector3) -> void:
 	cell = grid.clamp(value)
@@ -112,4 +116,6 @@ func attack(target: Character, abilityID: int) -> void:
 	attack_abilities[abilityID].execute(target)
 	print("AP cost: ", attack_abilities[abilityID].ap_cost)
 	action_points = action_points - attack_abilities[abilityID].ap_cost
+	
+
 	

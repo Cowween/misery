@@ -1,7 +1,7 @@
 extends Control
 
 @export var camera: Camera3D
-@export var SignalBus: Node
+@export var signal_bus: Node
 
 @onready var container = $ScrollContainer/VBoxContainer
 
@@ -39,7 +39,7 @@ func add_button(id: int, aname: String) -> void:
 	var btn = ability_btn.instantiate()
 	btn.text = aname
 	btn.abilityID = id
-	btn.SignalBus = SignalBus
+	btn.signal_bus = signal_bus
 	container.add_child(btn)
 	
 	

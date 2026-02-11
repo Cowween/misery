@@ -4,10 +4,9 @@ signal attack
 signal next_turn
 
 @onready var ap_text := $PlayerInfo/AP
-@onready var player_bar := $PlayerInfo/HBoxContainer/PlayerBar
-@onready var hp_bar := $PlayerInfo/HBoxContainer/HP
-@onready var atk_btn := $HBoxContainer/Attack
-@onready var turn_btn := $HBoxContainer/Turn
+@onready var player_bar := $PlayerInfo/Health/PlayerBar
+@onready var atk_btn := $PlayerInfo/FunctionalButtons/Attack
+@onready var turn_btn := $PlayerInfo/FunctionalButtons/Turn
 @onready var enemy_name := $EnemyInfo/EnemyName
 @onready var enemy_bar := $EnemyInfo/EnemyBar
 

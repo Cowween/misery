@@ -2,6 +2,8 @@
 
 [ext_resource type="Script" uid="uid://cyxcunk7lr1u0" path="res://Scripts/battle_ui.gd" id="1_ij1wg"]
 
+[sub_resource type="CanvasTexture" id="CanvasTexture_8ot8m"]
+
 [node name="BattleUI" type="Control" unique_id=1347659441]
 layout_mode = 3
 anchors_preset = 15
@@ -13,65 +15,109 @@ offset_right = 200.0
 offset_bottom = 48.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
 script = ExtResource("1_ij1wg")
 
 [node name="PlayerInfo" type="VBoxContainer" parent="." unique_id=14319706]
 layout_mode = 1
-anchors_preset = 2
-anchor_top = 1.0
-anchor_bottom = 1.0
-offset_left = 19.0
-offset_top = -205.0
-offset_right = 278.0
-offset_bottom = -127.0
+anchors_preset = -1
+anchor_left = -0.17400001
+anchor_top = 0.9250001
+anchor_right = -0.17400001
+anchor_bottom = 0.9250001
+offset_left = 50.448013
+offset_top = -185.40002
+offset_right = 309.448
+offset_bottom = -30.400024
 grow_vertical = 0
+metadata/_edit_group_ = true
 
 [node name="AP" type="Label" parent="PlayerInfo" unique_id=1866597355]
 layout_mode = 2
+size_flags_vertical = 6
 text = "AP:"
 
-[node name="HBoxContainer" type="HBoxContainer" parent="PlayerInfo" unique_id=550865808]
+[node name="Health" type="HBoxContainer" parent="PlayerInfo" unique_id=550865808]
 layout_mode = 2
+size_flags_vertical = 3
 
-[node name="HP" type="Label" parent="PlayerInfo/HBoxContainer" unique_id=932054250]
+[node name="HP" type="Label" parent="PlayerInfo/Health" unique_id=932054250]
 layout_mode = 2
 text = "HP:"
 
-[node name="PlayerBar" type="ProgressBar" parent="PlayerInfo/HBoxContainer" unique_id=1410393672]
+[node name="PlayerBar" type="ProgressBar" parent="PlayerInfo/Health" unique_id=1410393672]
 layout_mode = 2
 size_flags_horizontal = 3
 value = 100.0
 
-[node name="HBoxContainer" type="HBoxContainer" parent="." unique_id=1809582399]
-layout_mode = 1
-anchors_preset = 2
-anchor_top = 1.0
-anchor_bottom = 1.0
-offset_left = 45.0
-offset_top = -99.0
-offset_right = 218.385
-offset_bottom = -57.0
-grow_vertical = 0
+[node name="ADR" type="ProgressBar" parent="PlayerInfo" unique_id=2010923335]
+layout_mode = 2
+size_flags_vertical = 2
+size_flags_stretch_ratio = 2.0
+
+[node name="Esoterica" type="HBoxContainer" parent="PlayerInfo" unique_id=1748773607]
+layout_mode = 2
+size_flags_vertical = 3
+size_flags_stretch_ratio = 10.09
+
+[node name="Button" type="Button" parent="PlayerInfo/Esoterica" unique_id=1998017248]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "1"
+icon = SubResource("CanvasTexture_8ot8m")
+
+[node name="Button2" type="Button" parent="PlayerInfo/Esoterica" unique_id=584611017]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "2"
+
+[node name="Button3" type="Button" parent="PlayerInfo/Esoterica" unique_id=709130543]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "3"
+
+[node name="Button4" type="Button" parent="PlayerInfo/Esoterica" unique_id=1689934582]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "4"
+
+[node name="Button5" type="Button" parent="PlayerInfo/Esoterica" unique_id=973651618]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "5"
+
+[node name="Button6" type="Button" parent="PlayerInfo/Esoterica" unique_id=1967756337]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "6"
+
+[node name="FunctionalButtons" type="HBoxContainer" parent="PlayerInfo" unique_id=1809582399]
+layout_mode = 2
+size_flags_vertical = 3
+size_flags_stretch_ratio = 2.0
 theme_override_constants/separation = 5
 
-[node name="Attack" type="Button" parent="HBoxContainer" unique_id=996881734]
+[node name="Attack" type="Button" parent="PlayerInfo/FunctionalButtons" unique_id=996881734]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Attack"
 
-[node name="Turn" type="Button" parent="HBoxContainer" unique_id=2050268359]
+[node name="Turn" type="Button" parent="PlayerInfo/FunctionalButtons" unique_id=2050268359]
 layout_mode = 2
+size_flags_horizontal = 3
 text = "Next Turn"
 
 [node name="EnemyInfo" type="HBoxContainer" parent="." unique_id=736185309]
 layout_mode = 1
-anchors_preset = 1
-anchor_left = 1.0
-anchor_right = 1.0
-offset_left = -415.0
-offset_top = 18.0
-offset_right = -38.0
-offset_bottom = 45.0
+anchors_preset = -1
+anchor_left = 0.80200005
+anchor_top = -0.068
+anchor_right = 0.80200005
+anchor_bottom = -0.068
+offset_left = -376.90405
+offset_top = 41.064003
+offset_right = 0.095947266
+offset_bottom = 68.064
 grow_horizontal = 0
 metadata/_edit_group_ = true
 
@@ -84,5 +130,5 @@ horizontal_alignment = 2
 layout_mode = 2
 size_flags_horizontal = 3
 
-[connection signal="pressed" from="HBoxContainer/Attack" to="." method="_on_attack_pressed"]
-[connection signal="pressed" from="HBoxContainer/Turn" to="." method="_on_turn_pressed"]
+[connection signal="pressed" from="PlayerInfo/FunctionalButtons/Attack" to="." method="_on_attack_pressed"]
+[connection signal="pressed" from="PlayerInfo/FunctionalButtons/Turn" to="." method="_on_turn_pressed"]

@@ -1,0 +1,24 @@
+[gd_scene format=3 uid="uid://dl84svupqw8qx"]
+
+[ext_resource type="Script" uid="uid://e2x862hih58j" path="res://Scripts/States/battle_state_machine.gd" id="1_rj4wl"]
+[ext_resource type="Script" uid="uid://di181cbq5o2iv" path="res://Scripts/States/attack_targeting_state.gd" id="2_x27l0"]
+[ext_resource type="Script" uid="uid://t5lgkrgk4dte" path="res://Scripts/States/move_selection_state.gd" id="3_okcq5"]
+[ext_resource type="Script" uid="uid://ceog5qjmvg3iw" path="res://Scripts/States/moving_state.gd" id="4_ev8dc"]
+[ext_resource type="Script" uid="uid://bnnhxovegfxr7" path="res://Scripts/States/selection_state.gd" id="5_775mr"]
+
+[node name="BattleStateMachine" type="Node" unique_id=483840876 node_paths=PackedStringArray("initial_state")]
+script = ExtResource("1_rj4wl")
+initial_state = NodePath("SelectionState")
+
+[node name="AttackTargetingState" type="Node" parent="." unique_id=1811438603]
+script = ExtResource("2_x27l0")
+
+[node name="MoveSelectionState" type="Node" parent="." unique_id=1651578849]
+script = ExtResource("3_okcq5")
+
+[node name="MovingState" type="Node" parent="." unique_id=1771801394]
+script = ExtResource("4_ev8dc")
+
+[node name="SelectionState" type="Node" parent="." unique_id=1505818386]
+script = ExtResource("5_775mr")
+metadata/_custom_type_script = "uid://bd83hweinfd4c"

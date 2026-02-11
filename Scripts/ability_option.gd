@@ -1,8 +1,9 @@
 extends Button
 
-var SignalBus: Node
+var signal_bus: Node
 var abilityID:int
 
 
 func _on_pressed() -> void:
-	SignalBus.atk_pressed.emit(abilityID)
+	signal_bus.atk_pressed.emit(abilityID)
+	print("pressed")

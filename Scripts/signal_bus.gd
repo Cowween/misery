@@ -1,4 +1,5 @@
 extends Node
+class_name SignalBus
 
 signal action_done
 signal walk_finished

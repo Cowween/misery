@@ -8,7 +8,7 @@ func enter(_msg: Dictionary = {}) -> void:
 func exit() -> void:
 	# We DO NOT clear the overlay here immediately if transitioning to Moving, 
 	# but main.deselect_unit_for_movement handles cleanup nicely.
-	main.deselect_unit_for_movement(main.current.cell)
+	main.deselect_unit_for_movement()
 
 func handle_input(event: InputEvent) -> void:
 	if event.is_action_pressed("left_click"):

@@ -1,0 +1,12 @@
+[gd_scene format=3 uid="uid://bewa25plburrf"]
+
+[ext_resource type="Script" uid="uid://d0stljhwyshsu" path="res://Scripts/sword_wave.gd" id="1_fu2nw"]
+[ext_resource type="PackedScene" uid="uid://d1rnbv0ivc3hu" path="res://Scenes/Attacks/Ranges/cone_range.tscn" id="2_tlmsp"]
+
+[node name="SwordWave" type="Node" unique_id=931242433 node_paths=PackedStringArray("ability_range")]
+script = ExtResource("1_fu2nw")
+ability_range = NodePath("ConeRange")
+ability_name = "Sword Wave"
+
+[node name="ConeRange" parent="." unique_id=1514438347 instance=ExtResource("2_tlmsp")]
+max_range = 3

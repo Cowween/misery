@@ -14,6 +14,7 @@ const DIRECTIONS = [Vector3.LEFT, Vector3.RIGHT, Vector3.FORWARD, Vector3.BACK]
 @export var cname := "P1"
 @export var option_menu_offset := Vector2(10,10)
 @export var attack_abilities : Array[Ability] = []
+@export var special_abilities: Array[SpecialAbility] = []
 
 var action_points = 5: set = set_action_points
 var SignalBus: Node
@@ -56,6 +57,8 @@ func _ready() -> void:
 	
 	for i in attack_abilities:
 		i.ability_owner = self
+	for i in special_abilities:
+		i.set_ability_owner(self)
 	cell = initial_cell
 	position = grid.calculate_map_position(cell) + offset
 	_path_follow.progress = 0.0

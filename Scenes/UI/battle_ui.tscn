@@ -1,8 +1,7 @@
 [gd_scene format=3 uid="uid://bg6ed61lknyth"]
 
 [ext_resource type="Script" uid="uid://cyxcunk7lr1u0" path="res://Scripts/battle_ui.gd" id="1_ij1wg"]
-
-[sub_resource type="CanvasTexture" id="CanvasTexture_8ot8m"]
+[ext_resource type="PackedScene" uid="uid://d1xo0ioc7017e" path="res://Scenes/UI/special_button.tscn" id="2_w7saw"]
 
 [node name="BattleUI" type="Control" unique_id=1347659441]
 layout_mode = 3
@@ -60,36 +59,23 @@ layout_mode = 2
 size_flags_vertical = 3
 size_flags_stretch_ratio = 10.09
 
-[node name="Button" type="Button" parent="PlayerInfo/Esoterica" unique_id=1998017248]
+[node name="SpecialButton3" parent="PlayerInfo/Esoterica" unique_id=755307066 instance=ExtResource("2_w7saw")]
 layout_mode = 2
-size_flags_horizontal = 3
-text = "1"
-icon = SubResource("CanvasTexture_8ot8m")
 
-[node name="Button2" type="Button" parent="PlayerInfo/Esoterica" unique_id=584611017]
+[node name="SpecialButton2" parent="PlayerInfo/Esoterica" unique_id=1813362755 instance=ExtResource("2_w7saw")]
 layout_mode = 2
-size_flags_horizontal = 3
-text = "2"
 
-[node name="Button3" type="Button" parent="PlayerInfo/Esoterica" unique_id=709130543]
+[node name="SpecialButton" parent="PlayerInfo/Esoterica" unique_id=618400135 instance=ExtResource("2_w7saw")]
 layout_mode = 2
-size_flags_horizontal = 3
-text = "3"
 
-[node name="Button4" type="Button" parent="PlayerInfo/Esoterica" unique_id=1689934582]
+[node name="SpecialButton4" parent="PlayerInfo/Esoterica" unique_id=640098075 instance=ExtResource("2_w7saw")]
 layout_mode = 2
-size_flags_horizontal = 3
-text = "4"
 
-[node name="Button5" type="Button" parent="PlayerInfo/Esoterica" unique_id=973651618]
+[node name="SpecialButton5" parent="PlayerInfo/Esoterica" unique_id=106109184 instance=ExtResource("2_w7saw")]
 layout_mode = 2
-size_flags_horizontal = 3
-text = "5"
 
-[node name="Button6" type="Button" parent="PlayerInfo/Esoterica" unique_id=1967756337]
+[node name="SpecialButton6" parent="PlayerInfo/Esoterica" unique_id=1957297881 instance=ExtResource("2_w7saw")]
 layout_mode = 2
-size_flags_horizontal = 3
-text = "6"
 
 [node name="FunctionalButtons" type="HBoxContainer" parent="PlayerInfo" unique_id=1809582399]
 layout_mode = 2

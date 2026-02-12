@@ -1,0 +1,14 @@
+[gd_scene format=3 uid="uid://d1xo0ioc7017e"]
+
+[ext_resource type="Script" uid="uid://olj6qa36x54o" path="res://Scripts/special_button.gd" id="1_dhnhb"]
+
+[sub_resource type="CanvasTexture" id="CanvasTexture_8ot8m"]
+
+[node name="SpecialButton" type="Button" unique_id=755307066]
+size_flags_horizontal = 3
+toggle_mode = true
+text = "1"
+icon = SubResource("CanvasTexture_8ot8m")
+script = ExtResource("1_dhnhb")
+
+[connection signal="toggled" from="." to="." method="_on_toggled"]

@@ -99,6 +99,11 @@ func _handle_camera_input(event: InputEvent) -> void:
 
 # == HELPER FUNCTIONS FOR STATES ==
 
+func overlay_draw(cells: Array[Vector3], id: int) -> void:
+	$Overlay.clear()
+	for i in cells:
+		$Overlay.set_cell_item(i, id)
+
 # Called by MoveSelectionState
 func select_unit_for_movement(cell: Vector3) -> void:
 	if cell != current.cell:
@@ -121,7 +126,7 @@ func select_unit_for_movement(cell: Vector3) -> void:
 	$ArrowMap.initialise(points)
 
 # Called by SelectionState / MoveSelectionState
-func deselect_unit_for_movement(_cell: Vector3) -> void:
+func deselect_unit_for_movement() -> void:
 	$ArrowMap.stop()
 	$Overlay.clear()
 

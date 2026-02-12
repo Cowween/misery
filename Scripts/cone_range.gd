@@ -5,6 +5,7 @@ func get_tiles_in_range() -> Array[Vector3]:
 	var tiles: Array[Vector3] = []
 	
 	if not actor or not grid:
+		#print("No actor/ grid")
 		return tiles
 
 	var center = actor.cell
@@ -34,14 +35,14 @@ func get_tiles_in_range() -> Array[Vector3]:
 			
 			if grid.is_within_bounds(tile):
 				tiles.append(tile)
-
+	#print("Returning range", tiles)
 	return tiles
 
 func _get_facing_direction() -> Vector3:
 	if not actor:
 		return Vector3.FORWARD
 
-	var forward = -actor.global_transform.basis.z
+	var forward = actor._path_follow.global_transform.basis.z
 	if abs(forward.x) > abs(forward.z):
 		return Vector3(sign(forward.x), 0, 0)
 	else:

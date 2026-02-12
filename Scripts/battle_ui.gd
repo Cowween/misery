@@ -9,14 +9,21 @@ signal next_turn
 @onready var turn_btn := $PlayerInfo/FunctionalButtons/Turn
 @onready var enemy_name := $EnemyInfo/EnemyName
 @onready var enemy_bar := $EnemyInfo/EnemyBar
+@onready var esoterica := $PlayerInfo/Esoterica
+
+@export var signal_bus: SignalBus
 
 
 var AP := 0
 var target_hp := 0
+var special_buttons := []
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
+	special_buttons = esoterica.get_children()
 	hide_enemy_info()
+	for i in special_buttons:
+		i.signal_bus = signal_bus
 	pass # Replace with function body.
 
 
@@ -38,6 +45,10 @@ func update_ap(value:int) -> void:
 func hide_enemy_info() -> void:
 	enemy_bar.visible = false
 	enemy_name.visible = false
+
+func update_specials(specials_list: Array[SpecialAbility]) -> void:
+	for i in specials_list.size():
+		special_buttons[i].special_id = i
 
 func _on_turn_pressed() -> void:
 	emit_signal("next_turn")

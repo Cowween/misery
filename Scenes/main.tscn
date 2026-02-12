@@ -17,6 +17,7 @@
 [ext_resource type="PackedScene" uid="uid://cqho3uyy7s34w" path="res://Scenes/cursor.tscn" id="12_bvaut"]
 [ext_resource type="PackedScene" uid="uid://pa4cgay4kwro" path="res://Scenes/Attacks/heavy attack.tscn" id="12_fevyy"]
 [ext_resource type="PackedScene" uid="uid://col4orb8a3y68" path="res://Scenes/Attacks/slash.tscn" id="13_hibaj"]
+[ext_resource type="PackedScene" uid="uid://bewa25plburrf" path="res://Scenes/Attacks/Specials/sword_wave.tscn" id="14_hibaj"]
 [ext_resource type="PackedScene" uid="uid://j1bpwip3x252" path="res://Scenes/UI/attack_interface.tscn" id="16_k12tt"]
 [ext_resource type="PackedScene" uid="uid://dl84svupqw8qx" path="res://Scenes/StateMachine/battle_state_machine.tscn" id="19_fevyy"]
 
@@ -59,27 +60,33 @@ mesh_library = ExtResource("10_wsu2k")
 [node name="Cursor" parent="." unique_id=1127224615 instance=ExtResource("12_bvaut")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.74361, 1.18289, -6.32617)
 
-[node name="Character" parent="." unique_id=120968370 node_paths=PackedStringArray("attack_abilities") instance=ExtResource("2_r85wr")]
+[node name="Character" parent="." unique_id=120968370 node_paths=PackedStringArray("attack_abilities", "special_abilities") instance=ExtResource("2_r85wr")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.48616, 2.41666, 0)
 initial_cell = Vector3(5, 0, 3)
 option_menu_offset = Vector2(100, -100)
 attack_abilities = [NodePath("HeavyAttack"), NodePath("Slash")]
+special_abilities = [NodePath("SwordWave")]
 
 [node name="HeavyAttack" parent="Character" unique_id=218684482 instance=ExtResource("12_fevyy")]
 
 [node name="Slash" parent="Character" unique_id=1686365112 instance=ExtResource("13_hibaj")]
 
-[node name="Character2" parent="." unique_id=276793439 node_paths=PackedStringArray("attack_abilities") instance=ExtResource("2_r85wr")]
+[node name="SwordWave" parent="Character" unique_id=931242433 instance=ExtResource("14_hibaj")]
+
+[node name="Character2" parent="." unique_id=276793439 node_paths=PackedStringArray("attack_abilities", "special_abilities") instance=ExtResource("2_r85wr")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.124868, 2.267197, 4.0011683)
 initial_cell = Vector3(3, 0, 0)
 cname = "P2"
 option_menu_offset = Vector2(100, -100)
 attack_abilities = [NodePath("Slash"), NodePath("HeavyAttack")]
+special_abilities = [NodePath("SwordWave")]
 
 [node name="Slash" parent="Character2" unique_id=690904165 instance=ExtResource("13_hibaj")]
 
 [node name="HeavyAttack" parent="Character2" unique_id=65047472 instance=ExtResource("12_fevyy")]
 ap_cost = 3
+
+[node name="SwordWave" parent="Character2" unique_id=178255201 instance=ExtResource("14_hibaj")]
 
 [node name="ArrowMap" type="GridMap" parent="." unique_id=1728430268]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0)
@@ -99,8 +106,9 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 
-[node name="BattleUI" parent="UI elements" unique_id=1647881709 instance=ExtResource("2_xer0r")]
+[node name="BattleUI" parent="UI elements" unique_id=1647881709 node_paths=PackedStringArray("signal_bus") instance=ExtResource("2_xer0r")]
 layout_mode = 1
+signal_bus = NodePath("../../SignalBus")
 
 [node name="attack_interface" parent="UI elements" unique_id=1903270686 node_paths=PackedStringArray("camera", "signal_bus") instance=ExtResource("16_k12tt")]
 layout_mode = 1

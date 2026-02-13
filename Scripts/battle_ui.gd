@@ -10,6 +10,7 @@ signal next_turn
 @onready var enemy_name := $EnemyInfo/EnemyName
 @onready var enemy_bar := $EnemyInfo/EnemyBar
 @onready var esoterica := $PlayerInfo/Esoterica
+@onready var adrenaline_bar := $PlayerInfo/ADR
 
 @export var signal_bus: SignalBus
 
@@ -49,6 +50,10 @@ func hide_enemy_info() -> void:
 func update_specials(specials_list: Array[SpecialAbility]) -> void:
 	for i in specials_list.size():
 		special_buttons[i].special_id = i
+
+func update_adrenaline(adrenaline: int, max_adr: int) -> void:
+	adrenaline_bar.value = adrenaline
+	adrenaline_bar.max_value = max_adr
 
 func _on_turn_pressed() -> void:
 	emit_signal("next_turn")

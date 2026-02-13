@@ -6,10 +6,7 @@ var s_range : Array[Vector3]
 func enter(msg: Dictionary = {}) -> void:
 	print("Entering Special Selection Mode")
 	special = msg.get("special")
-	print("Special:", special.ability_name)
-	print(special.ability_range)
 	s_range = special.ability_range.get_tiles_in_range()
-	print(s_range)
 	main.overlay_draw(s_range, 1)
 
 	if not signal_bus.is_connected("special_pressed", _on_special_pressed):

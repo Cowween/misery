@@ -1,7 +1,8 @@
-[gd_scene load_steps=8 format=3 uid="uid://cn3s6qne74y30"]
+[gd_scene format=3 uid="uid://cn3s6qne74y30"]
 
 [ext_resource type="Texture2D" uid="uid://dkiv8rdd2oxol" path="res://Assets/icon.svg" id="1_i22iv"]
 [ext_resource type="Texture2D" uid="uid://daovyp8lu56ac" path="res://Assets/tile.png" id="2_rinnr"]
+[ext_resource type="PackedScene" uid="uid://qxvv3m0kd22f" path="res://TestAssets/Pieces/ground.fbx" id="3_1nd0u"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_512xe"]
 albedo_texture = ExtResource("1_i22iv")
@@ -18,26 +19,31 @@ albedo_texture = ExtResource("2_rinnr")
 [sub_resource type="PlaneMesh" id="PlaneMesh_j4ee8"]
 material = SubResource("StandardMaterial3D_7d5se")
 
-[node name="Tiles" type="Node3D"]
+[node name="Tiles" type="Node3D" unique_id=982418080]
 
-[node name="NormalTile" type="MeshInstance3D" parent="."]
+[node name="NormalTile" type="MeshInstance3D" parent="." unique_id=109821182]
 transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, -1, 0)
 mesh = SubResource("PlaneMesh_be8im")
 
-[node name="StaticBody3D" type="StaticBody3D" parent="NormalTile"]
+[node name="StaticBody3D" type="StaticBody3D" parent="NormalTile" unique_id=1072757811]
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="NormalTile/StaticBody3D"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="NormalTile/StaticBody3D" unique_id=522770182]
 shape = SubResource("ConvexPolygonShape3D_mkgt0")
 
-[node name="Center" type="Node3D" parent="NormalTile"]
+[node name="Center" type="Node3D" parent="NormalTile" unique_id=1721362639]
 
-[node name="NormalTile2" type="MeshInstance3D" parent="."]
+[node name="NormalTile2" type="MeshInstance3D" parent="." unique_id=1336651645]
 transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, -1, 4.51838)
 mesh = SubResource("PlaneMesh_j4ee8")
 
-[node name="StaticBody3D" type="StaticBody3D" parent="NormalTile2"]
+[node name="StaticBody3D" type="StaticBody3D" parent="NormalTile2" unique_id=705367705]
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="NormalTile2/StaticBody3D"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="NormalTile2/StaticBody3D" unique_id=856347621]
 shape = SubResource("ConvexPolygonShape3D_mkgt0")
 
-[node name="Center" type="Node3D" parent="NormalTile2"]
+[node name="Center" type="Node3D" parent="NormalTile2" unique_id=966577838]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1980251912]
+
+[node name="ground" parent="." unique_id=1618548421 instance=ExtResource("3_1nd0u")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.6491337, 0, 1.9885683)

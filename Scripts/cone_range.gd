@@ -1,49 +1,44 @@
 extends AbilityRange
 class_name ConeRange
 
-func get_tiles_in_range() -> Array[Vector3]:
+func get_tiles_in_range(origin: Variant = null, direction: Vector3 = Vector3.FORWARD) -> Array[Vector3]:
 	var tiles: Array[Vector3] = []
 	
-	if not actor or not grid:
-		#print("No actor/ grid")
-		return tiles
-
-	var center = actor.cell
-	
-	if min_range == 0:
-		tiles.append(center)
-
-	var direction = _get_facing_direction()
-	
-	# Calculate lateral (right) vector for width expansion
-	var lateral_dir = Vector3.ZERO
-	if direction.z != 0: 
-		lateral_dir = Vector3(1, 0, 0) # If facing Z, lateral is X
+	var start_point: Vector3
+	if origin != null:
+		start_point = origin
+	elif actor:
+		start_point = actor.cell
 	else:
-		lateral_dir = Vector3(0, 0, 1) # If facing X, lateral is Z
+		return tiles
+		
+	if not grid: grid = preload("res://Resources/Grid.tres")
+
+	if min_range == 0:
+		tiles.append(start_point)
+
+	# Determine Direction
+	var cast_dir = direction
+	if origin == null and actor:
+		cast_dir = _get_facing_direction()
+	
+	# Calculate lateral (right) vector for width
+	var lateral_dir = Vector3.ZERO
+	if cast_dir.z != 0: 
+		lateral_dir = Vector3(1, 0, 0)
+	else:
+		lateral_dir = Vector3(0, 0, 1)
 
 	var start_dist = max(1, min_range)
 
 	for r in range(start_dist, max_range + 1):
-		var spine_pos = center + (direction * r)
+		var spine_pos = start_point + (cast_dir * r)
 		
-		# 90-degree cone width logic: width expands by 1 on each side per step
-		# At distance 1: width is -1 to 1 (3 tiles)
-		# At distance 2: width is -2 to 2 (5 tiles)
+		# Cone width: expands by 1 on each side per step
 		for w in range(-r, r + 1):
 			var tile = spine_pos + (lateral_dir * w)
 			
 			if grid.is_within_bounds(tile):
 				tiles.append(tile)
-	#print("Returning range", tiles)
+
 	return tiles
-
-func _get_facing_direction() -> Vector3:
-	if not actor:
-		return Vector3.FORWARD
-
-	var forward = actor._path_follow.global_transform.basis.z
-	if abs(forward.x) > abs(forward.z):
-		return Vector3(sign(forward.x), 0, 0)
-	else:
-		return Vector3(0, 0, sign(forward.z))

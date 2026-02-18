@@ -50,7 +50,7 @@ script = ExtResource("7_wqngb")
 sensitivity = 100
 
 [node name="Camera3D" type="Camera3D" parent="CameraContainer/CameraPivot" unique_id=2039600524]
-transform = Transform3D(1, 0, 0, 0, 0.8587006, 0.51247776, 0, -0.51247776, 0.8587006, 1.9639645, 3.0610833, 5.703085)
+transform = Transform3D(1, 0, 0, 0, 0.858701, 0.512478, 0, -0.512478, 0.858701, -0.489256, 4.76222, 8.58342)
 script = ExtResource("8_ypjsh")
 
 [node name="Overlay" type="GridMap" parent="." unique_id=119309149]

@@ -3,19 +3,27 @@ extends Path3D
 
 const DIRECTIONS = [Vector3.LEFT, Vector3.RIGHT, Vector3.FORWARD, Vector3.BACK]
 
-@export var speed = 5
-@export var ap_per_turn = 5
-@export var max_hp = 100
+#==SETTINGS==
 @export var grid: Resource = preload("res://Resources/Grid.tres")
 @export var offset := Vector3(0,2,0)
 @export var initial_cell := Vector3(0,0,0)
-@export var atk_range := 2
-@export var atk := 3
 @export var cname := "P1"
 @export var option_menu_offset := Vector2(10,10)
+
+#==STATS==
+@export var agility := 100
+@export var ap_per_turn = 5
+@export var max_hp = 100
+@export var atk_range := 2
+@export var atk := 3
+@export var def := 10
+@export var crit_rate := 2
+
+#==ABILIITIES==
 @export var attack_abilities : Array[Ability] = []
 @export var special_abilities: Array[SpecialAbility] = []
 
+#==PRIVATE VARIABLES==
 var action_points = 5: set = set_action_points
 var SignalBus: Node
 var cell := Vector3.ZERO: set = set_cell
@@ -26,7 +34,7 @@ var is_walking = false : set = set_is_walking
 var hp = max_hp: set =set_hp
 var walking_ap := 0
 var adrenaline := 0
-
+var speed := 5
 @onready var _path_follow = $PathFollow3D
 		
 
@@ -57,6 +65,7 @@ func _ready() -> void:
 	
 	for i in attack_abilities:
 		i.ability_owner = self
+		i.set_range(atk_range,  1)
 	for i in special_abilities:
 		i.set_ability_owner(self)
 	cell = initial_cell

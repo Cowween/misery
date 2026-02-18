@@ -1,35 +1,31 @@
 extends AbilityRange
 class_name CrossRange
 
-func get_tiles_in_range() -> Array[Vector3]:
+func get_tiles_in_range(origin: Variant = null, _direction: Vector3 = Vector3.FORWARD) -> Array[Vector3]:
 	var tiles: Array[Vector3] = []
 	
-	if not actor or not grid:
+	var start_point: Vector3
+	if origin != null:
+		start_point = origin
+	elif actor:
+		start_point = actor.cell
+	else:
 		return tiles
+		
+	if not grid: grid = preload("res://Resources/Grid.tres")
 
-	var center = actor.cell
-	
-	# Handle Center (Distance 0) explicitly if min_range is 0
 	if min_range == 0:
-		tiles.append(center)
+		tiles.append(start_point)
 
-	var directions = [
-		Vector3(0, 0, 1),
-		Vector3(0, 0, -1),
-		Vector3(1, 0, 0),
-		Vector3(-1, 0, 0)
-	]
-
-	# Start loop from max(1, min_range) to skip center if needed
+	var directions = [Vector3.FORWARD, Vector3.BACK, Vector3.LEFT, Vector3.RIGHT]
 	var start_dist = max(1, min_range)
 	
 	for dir in directions:
 		for r in range(start_dist, max_range + 1):
-			var tile = center + (dir * r)
-			
+			var tile = start_point + (dir * r)
 			if grid.is_within_bounds(tile):
 				tiles.append(tile)
 			else:
-				# Optimization: If we hit a map edge, stop checking further in this direction
-				break
+				break 
+
 	return tiles

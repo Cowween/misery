@@ -37,4 +37,5 @@ func handle_input(event: InputEvent) -> void:
 func _on_attack_executed(_atk_id: int) -> void:
 	# Main.gd handles the actual damage logic via its own signal connection
 	# We just need to exit this state
+	main.current.attack(main.current_target, _atk_id)
 	state_machine.change_state("SelectionState")

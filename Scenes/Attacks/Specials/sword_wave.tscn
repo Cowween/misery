@@ -10,3 +10,4 @@ ability_name = "Sword Wave"
 
 [node name="ConeRange" parent="." unique_id=1514438347 instance=ExtResource("2_tlmsp")]
 max_range = 3
+min_range = 2

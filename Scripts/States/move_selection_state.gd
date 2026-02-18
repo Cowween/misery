@@ -1,6 +1,7 @@
 # misery/Scripts/States/move_selection_state.gd
 extends BattleState
 
+
 func enter(_msg: Dictionary = {}) -> void:
 	main.select_unit_for_movement(main.current.cell)
 	print("Move selection state")
@@ -33,9 +34,13 @@ func handle_input(event: InputEvent) -> void:
 			_initiate_move(cursor_pos, false)
 
 func _initiate_move(target_cell: Vector3, is_attack_queued: bool) -> void:
-	var move_target = target_cell
+	var move_target := target_cell
+	var surrounding_tiles := []
 	
-	if main.current.action_points == 1 and is_attack_queued:
+	for dir in DIRECTIONS:
+		surrounding_tiles.append(main.current.cell+dir)
+	
+	if move_target in surrounding_tiles and is_attack_queued:
 		state_machine.change_state("AttackTargetingState", {
 			"auto_target": target_cell
 		})

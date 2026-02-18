@@ -1,6 +1,8 @@
 extends Node
 class_name BattleState
 
+const DIRECTIONS = [Vector3.LEFT, Vector3.RIGHT, Vector3.FORWARD, Vector3.BACK]
+
 var main: Main # Reference to Main.gd
 var state_machine: BattleStateMachine
 var signal_bus: SignalBus

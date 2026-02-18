@@ -1,8 +1,13 @@
-[gd_scene load_steps=2 format=3 uid="uid://pa4cgay4kwro"]
+[gd_scene format=3 uid="uid://pa4cgay4kwro"]
 
 [ext_resource type="Script" uid="uid://cu6xcop6b5jg0" path="res://Scripts/heavy_attack.gd" id="1_xvajp"]
+[ext_resource type="PackedScene" uid="uid://db1knfwyv5ukh" path="res://Scenes/Attacks/Ranges/diamond_range.tscn" id="2_w7cq1"]
 
-[node name="HeavyAttack" type="Node"]
+[node name="HeavyAttack" type="Node" unique_id=1952292855 node_paths=PackedStringArray("ability_range")]
 script = ExtResource("1_xvajp")
 atk_multiplier = 2
 ability_name = "Heavy Attack"
+ability_range = NodePath("DiamondRange")
+
+[node name="DiamondRange" parent="." unique_id=1447504178 instance=ExtResource("2_w7cq1")]
+min_range = 1

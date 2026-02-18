@@ -1,24 +1,24 @@
-[gd_scene load_steps=4 format=3 uid="uid://dbgck5bxvyatv"]
+[gd_scene format=3 uid="uid://dbgck5bxvyatv"]
 
 [ext_resource type="Script" uid="uid://c5rioclrkg27w" path="res://Scripts/character.gd" id="1_s7nlw"]
 [ext_resource type="PackedScene" uid="uid://88puy8ktt5pe" path="res://TestAssets/Character/Character.fbx" id="2_x3y0s"]
 
 [sub_resource type="CylinderShape3D" id="CylinderShape3D_a73ml"]
 
-[node name="Character" type="Path3D" groups=["Characters"]]
+[node name="Character" type="Path3D" unique_id=27490163 groups=["Characters"]]
 script = ExtResource("1_s7nlw")
 
-[node name="PathFollow3D" type="PathFollow3D" parent="."]
+[node name="PathFollow3D" type="PathFollow3D" parent="." unique_id=84053517]
 progress = 395.136
 rotation_mode = 1
 use_model_front = true
 loop = false
 tilt_enabled = false
 
-[node name="CharacterBody3D" type="StaticBody3D" parent="PathFollow3D"]
+[node name="CharacterBody3D" type="StaticBody3D" parent="PathFollow3D" unique_id=1247368120]
 
-[node name="Character" parent="PathFollow3D/CharacterBody3D" instance=ExtResource("2_x3y0s")]
+[node name="Character" parent="PathFollow3D/CharacterBody3D" unique_id=1407552660 instance=ExtResource("2_x3y0s")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.02016, 0)
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="PathFollow3D/CharacterBody3D"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="PathFollow3D/CharacterBody3D" unique_id=2109183117]
 shape = SubResource("CylinderShape3D_a73ml")

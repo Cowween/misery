@@ -3,36 +3,34 @@ class_name LineRange
 
 @export var use_actor_rotation: bool = true
 
-func get_tiles_in_range() -> Array[Vector3]:
+func get_tiles_in_range(origin: Variant = null, direction: Vector3 = Vector3.FORWARD) -> Array[Vector3]:
 	var tiles: Array[Vector3] = []
 	
-	if not actor or not grid:
+	var start_point: Vector3
+	if origin != null:
+		start_point = origin
+	elif actor:
+		start_point = actor.cell
+	else:
 		return tiles
+		
+	if not grid: grid = preload("res://Resources/Grid.tres")
 
-	var center = actor.cell
-	
 	if min_range == 0:
-		tiles.append(center)
+		tiles.append(start_point)
 	
-	var direction = _get_facing_direction()
+	# Determine Direction
+	var cast_dir = direction
+	if origin == null and use_actor_rotation and actor:
+		cast_dir = _get_facing_direction()
+	
 	var start_dist = max(1, min_range)
 	
 	for r in range(start_dist, max_range + 1):
-		var tile = center + (direction * r)
-		
+		var tile = start_point + (cast_dir * r)
 		if grid.is_within_bounds(tile):
 			tiles.append(tile)
 		else:
 			break
 
 	return tiles
-
-func _get_facing_direction() -> Vector3:
-	if not use_actor_rotation or not actor:
-		return Vector3.FORWARD
-
-	var forward = -actor.global_transform.basis.z
-	if abs(forward.x) > abs(forward.z):
-		return Vector3(sign(forward.x), 0, 0)
-	else:
-		return Vector3(0, 0, sign(forward.z))

@@ -1,7 +1,11 @@
-[gd_scene load_steps=2 format=3 uid="uid://col4orb8a3y68"]
+[gd_scene format=3 uid="uid://col4orb8a3y68"]
 
 [ext_resource type="Script" uid="uid://bnj7xjug45h0y" path="res://Scripts/slash.gd" id="1_oa1n1"]
+[ext_resource type="PackedScene" uid="uid://db1knfwyv5ukh" path="res://Scenes/Attacks/Ranges/diamond_range.tscn" id="2_txi82"]
 
-[node name="Slash" type="Node"]
+[node name="Slash" type="Node" unique_id=1643767841 node_paths=PackedStringArray("ability_range")]
 script = ExtResource("1_oa1n1")
 ability_name = "Slash"
+ability_range = NodePath("DiamondRange")
+
+[node name="DiamondRange" parent="." unique_id=1447504178 instance=ExtResource("2_txi82")]

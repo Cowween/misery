@@ -1,0 +1,9 @@
+[gd_scene format=3 uid="uid://bdo0lb0rr33px"]
+
+[ext_resource type="Script" uid="uid://dqhex2mkpm8me" path="res://Scripts/Statuses/resentment_effect.gd" id="1_e75sa"]
+
+[node name="ResentmentEffect" type="Node" unique_id=1259468661]
+script = ExtResource("1_e75sa")
+base_duration = 4
+status_name = "Resentment"
+texture = Color(0.8265091, 3.7301331e-06, 6.738305e-07, 1)

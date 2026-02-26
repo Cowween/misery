@@ -1,0 +1,8 @@
+[gd_scene format=3 uid="uid://bao4oc6m47qie"]
+
+[ext_resource type="Script" uid="uid://de4n7ht0qc3va" path="res://Scripts/Statuses/avarice_effect.gd" id="1_007pj"]
+
+[node name="AvariceEffect" type="Node" unique_id=1756848030]
+script = ExtResource("1_007pj")
+status_name = "Avarice"
+texture = Color(0.8669012, 0.811018, 0.009424771, 1)

@@ -1,0 +1,9 @@
+[gd_scene format=3 uid="uid://ciw3jc2ovvfuc"]
+
+[ext_resource type="Script" uid="uid://bwel85tvj3304" path="res://Scripts/Statuses/restraint_effect.gd" id="1_sxoyu"]
+
+[node name="RestraintEffect" type="Node" unique_id=179382336]
+script = ExtResource("1_sxoyu")
+base_duration = 4
+status_name = "Restraint"
+texture = Color(0.34483975, 0.6645288, 0.2458533, 1)

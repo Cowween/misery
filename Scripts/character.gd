@@ -13,7 +13,7 @@ const DIRECTIONS = [Vector3.LEFT, Vector3.RIGHT, Vector3.FORWARD, Vector3.BACK]
 #==STATS==
 @export var agility := 100
 @export var ap_per_turn = 5
-@export var max_hp = 100
+@export var max_hp = 100.0
 @export var atk_range := 2
 @export var atk := 3
 @export var def := 10
@@ -25,7 +25,7 @@ const DIRECTIONS = [Vector3.LEFT, Vector3.RIGHT, Vector3.FORWARD, Vector3.BACK]
 
 #==PRIVATE VARIABLES==
 var action_points = 5: set = set_action_points
-var SignalBus: Node
+var signal_bus: SignalBus
 var cell := Vector3.ZERO: set = set_cell
 var tile_over = true
 var initiative = randi_range(0,11)
@@ -35,15 +35,17 @@ var hp = max_hp: set =set_hp
 var walking_ap := 0
 var adrenaline := 0
 var speed := 5
+var status_effects : Array[StatusEffect]
+var atk_mult := 1
+var atk_add := 0
 @onready var _path_follow = $PathFollow3D
 		
-
 func set_cell(value: Vector3) -> void:
 	cell = grid.clamp(value)
 	
-func set_hp(value: int) -> void:
+func set_hp(value: float) -> void:
 	hp = value
-	SignalBus.hp_update.emit(value)
+	signal_bus.hp_update.emit(value)
 	
 func set_is_walking(value: bool) -> void:
 	is_walking = value
@@ -52,12 +54,27 @@ func set_is_walking(value: bool) -> void:
 func set_action_points(value: int) -> void:
 	action_points = value
 	print(cname, "ap", value)
-	SignalBus.ap_update.emit(value)
+	signal_bus.ap_update.emit(value)
 	if action_points == 0:
-		SignalBus.action_done.emit()
+		signal_bus.action_done.emit()
 	
+func turn_start() -> void:
+	#connected to  main turn start
+	for i in status_effects:
+		i.on_turn_start()
+	status_update(true)
+
+func turn_end() -> void:
+	#connected to main turn end
+	for i in status_effects:
+		i.on_turn_end()
 	
-	
+func status_update(self_inflicted: bool) -> void:
+	if self_inflicted:
+		signal_bus.emit_signal("status_update", self, true)
+	else:
+		signal_bus.emit_signal("status_update", self, false)
+
 func initialise() -> void:
 	action_points = ap_per_turn
 
@@ -99,7 +116,7 @@ func _process(delta: float) -> void:
 		#print(_path_follow.progress_ratio)
 		curve.clear_points()
 		# Finally, we emit a signal. We'll use this one with the game board.
-		SignalBus.walk_finished.emit()
+		signal_bus.walk_finished.emit()
 
 func walk_along(path: PackedVector3Array) -> void:
 	if path.is_empty():

@@ -7,6 +7,9 @@ signal ap_update(value:int)
 signal hp_update(value:int)
 signal atk_pressed(atk_id: int)
 signal special_pressed(toggle: bool, special_id: int)
+signal turn_start
+signal turn_end
+signal status_update(target: Character, is_player: bool)
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:

@@ -18,6 +18,7 @@
 [ext_resource type="PackedScene" uid="uid://pa4cgay4kwro" path="res://Scenes/Attacks/heavy attack.tscn" id="12_fevyy"]
 [ext_resource type="PackedScene" uid="uid://col4orb8a3y68" path="res://Scenes/Attacks/slash.tscn" id="13_hibaj"]
 [ext_resource type="PackedScene" uid="uid://bewa25plburrf" path="res://Scenes/Attacks/Specials/sword_wave.tscn" id="14_hibaj"]
+[ext_resource type="PackedScene" uid="uid://c6tmqbiecripr" path="res://Scenes/Attacks/resentment_inflict_test.tscn" id="15_pdsj5"]
 [ext_resource type="PackedScene" uid="uid://j1bpwip3x252" path="res://Scenes/UI/attack_interface.tscn" id="16_k12tt"]
 [ext_resource type="PackedScene" uid="uid://dl84svupqw8qx" path="res://Scenes/StateMachine/battle_state_machine.tscn" id="19_fevyy"]
 
@@ -64,7 +65,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.74361, 1.18289, -6.32617)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.48616, 2.41666, 0)
 initial_cell = Vector3(5, 0, 3)
 option_menu_offset = Vector2(100, -100)
-attack_abilities = [NodePath("HeavyAttack"), NodePath("Slash")]
+attack_abilities = [NodePath("HeavyAttack"), NodePath("Slash"), NodePath("ResentmentInflictTest")]
 special_abilities = [NodePath("SwordWave")]
 
 [node name="HeavyAttack" parent="Character" unique_id=218684482 instance=ExtResource("12_fevyy")]
@@ -72,6 +73,8 @@ special_abilities = [NodePath("SwordWave")]
 [node name="Slash" parent="Character" unique_id=1686365112 instance=ExtResource("13_hibaj")]
 
 [node name="SwordWave" parent="Character" unique_id=931242433 instance=ExtResource("14_hibaj")]
+
+[node name="ResentmentInflictTest" parent="Character" unique_id=1870127254 instance=ExtResource("15_pdsj5")]
 
 [node name="Character2" parent="." unique_id=276793439 node_paths=PackedStringArray("attack_abilities", "special_abilities") instance=ExtResource("2_r85wr")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.124868, 2.267197, 4.0011683)
@@ -125,6 +128,7 @@ signal_bus = NodePath("../SignalBus")
 [connection signal="action_done" from="SignalBus" to="." method="_on_signal_bus_action_done"]
 [connection signal="ap_update" from="SignalBus" to="UI elements/BattleUI" method="_on_signal_bus_ap_update"]
 [connection signal="atk_pressed" from="SignalBus" to="." method="_on_signal_bus_atk_pressed"]
+[connection signal="status_update" from="SignalBus" to="UI elements/BattleUI" method="_on_signal_bus_status_update"]
 [connection signal="walk_finished" from="SignalBus" to="." method="_on_signal_bus_walk_finished"]
 [connection signal="attack" from="UI elements/BattleUI" to="." method="_on_battle_ui_attack"]
 [connection signal="next_turn" from="UI elements/BattleUI" to="SignalBus" method="_on_battle_ui_next_turn"]

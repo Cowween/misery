@@ -30,13 +30,14 @@ func _ready() -> void:
 	queue = get_tree().get_nodes_in_group("Characters")
 	queue.sort_custom(sort_queue)
 	for i in queue:
-		i.SignalBus = $SignalBus
+		i.signal_bus = $SignalBus
 		occupied_tiles[i] = grid.calculate_grid_coordinates(Vector3i(i.position.x, 0, i.position.z))
 	
 	queue_in_action = queue.duplicate()
 	current = queue_in_action.pop_front()
 	$Arrow.target = current._path_follow
 	occupied_tiles[current] = null
+	current.turn_start()
 	
 	# UI Updates
 	battle_ui.update_ap(current.action_points)
@@ -58,8 +59,8 @@ func _process(_delta: float) -> void:
 	
 	# 2. Hover Info (Always Active)
 	if cursor_pos in occupied_tiles.values():
-		var target = occupied_tiles.find_key(cursor_pos)
-		battle_ui.display_enemy_info(target.cname, target.hp, target.max_hp)
+		var target : Character = occupied_tiles.find_key(cursor_pos)
+		battle_ui.display_enemy_info(target)
 	else:
 		battle_ui.hide_enemy_info()
 
@@ -280,12 +281,14 @@ func _on_signal_bus_action_done() -> void:
 
 	var tile = grid.calculate_grid_coordinates(Vector3i(current.position.x, 0, current.position.z))
 	occupied_tiles[current] = tile
+	current.turn_end()
 	
 	# Switch Turn
 	current = queue_in_action.pop_front()
 	current.initialise()
 	occupied_tiles[current] = null
 	$Arrow.target = current._path_follow
+	current.turn_start()
 	
 	# Update Camera & UI
 	current.current_basis = current.transform.basis

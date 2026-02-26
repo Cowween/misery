@@ -2,6 +2,7 @@ extends Control
 
 signal attack
 signal next_turn
+const status_icon := preload("uid://bphm2w3qsdq7a")
 
 @onready var ap_text := $PlayerInfo/AP
 @onready var player_bar := $PlayerInfo/Health/PlayerBar
@@ -11,6 +12,9 @@ signal next_turn
 @onready var enemy_bar := $EnemyInfo/EnemyBar
 @onready var esoterica := $PlayerInfo/Esoterica
 @onready var adrenaline_bar := $PlayerInfo/ADR
+@onready var player_statuses := $PlayerStatuses
+@onready var enemy_statuses := $EnemyStatuses
+
 
 @export var signal_bus: SignalBus
 
@@ -34,11 +38,14 @@ func update_p_health(hp:float, max_hp:float):
 	print((hp/max_hp)*100)
 	player_bar.value = (hp/max_hp) * 100
 	
-func display_enemy_info(name:String, hp: float, max_hp: float) -> void:
+func display_enemy_info(target: Character) -> void:
 	enemy_bar.visible = true
 	enemy_name.visible = true
-	enemy_bar.value = (hp/max_hp) * 100
-	enemy_name.text = name
+	enemy_statuses.visible = true
+	#print(target.hp/target.max_hp)
+	enemy_bar.value = (target.hp/target.max_hp) * 100
+	enemy_name.text = target.cname
+	update_status_bar(target, false)
 	
 func update_ap(value:int) -> void:
 	ap_text.text = "AP: %s" % value
@@ -46,6 +53,7 @@ func update_ap(value:int) -> void:
 func hide_enemy_info() -> void:
 	enemy_bar.visible = false
 	enemy_name.visible = false
+	enemy_statuses.visible = false
 
 func update_specials(specials_list: Array[SpecialAbility]) -> void:
 	for i in specials_list.size():
@@ -61,7 +69,25 @@ func _on_turn_pressed() -> void:
 
 func _on_attack_pressed() -> void:
 	emit_signal("attack")
-
+	
 
 func _on_signal_bus_ap_update(value: int) -> void:
 	update_ap(value)
+	
+func update_status_bar(target: Character, is_player: bool) -> void:
+	var working_status_bar := enemy_statuses
+	if is_player:
+		working_status_bar = player_statuses
+	for i in working_status_bar.get_children():
+		i.queue_free()
+	for i in target.status_effects:
+		var new_status := status_icon.instantiate()
+		
+		working_status_bar.add_child(new_status)
+		new_status.initialise(i.texture, is_player, i.status_name, i.stacks, i._duration)
+		
+		
+
+
+func _on_signal_bus_status_update(target: Character, is_player: bool) -> void:
+	update_status_bar(target, is_player)

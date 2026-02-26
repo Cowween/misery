@@ -1,0 +1,38 @@
+[gd_scene format=3 uid="uid://bphm2w3qsdq7a"]
+
+[ext_resource type="Script" uid="uid://ta4tosoo3mg" path="res://Scripts/status.gd" id="1_x4d6w"]
+
+[node name="Status" type="ColorRect" unique_id=229806799]
+custom_minimum_size = Vector2(40, 4)
+offset_right = 40.0
+offset_bottom = 40.0
+size_flags_horizontal = 10
+color = Color(0.44909894, 0.02993426, 0.019484315, 1)
+script = ExtResource("1_x4d6w")
+
+[node name="StacksCount" type="Label" parent="." unique_id=1116500713]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -15.0
+offset_top = -25.0
+offset_right = -1.0
+offset_bottom = -2.0
+grow_horizontal = 0
+grow_vertical = 0
+text = "1"
+
+[node name="Duration" type="Label" parent="." unique_id=1553109695]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 5.0
+offset_top = -25.0
+offset_right = 19.0
+offset_bottom = -2.0
+grow_vertical = 0
+text = "1"

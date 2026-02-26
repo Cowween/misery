@@ -1,0 +1,13 @@
+[gd_scene format=3 uid="uid://c6tmqbiecripr"]
+
+[ext_resource type="Script" uid="uid://cx2qnlfex451r" path="res://Scripts/resentment_inflict_test.gd" id="1_as4v8"]
+[ext_resource type="PackedScene" uid="uid://bdo0lb0rr33px" path="res://Scenes/Statuses/resentment_effect.tscn" id="2_r4487"]
+[ext_resource type="PackedScene" uid="uid://db1knfwyv5ukh" path="res://Scenes/Attacks/Ranges/diamond_range.tscn" id="3_mrsey"]
+
+[node name="ResentmentInflictTest" type="Node" unique_id=1870127254 node_paths=PackedStringArray("ability_range")]
+script = ExtResource("1_as4v8")
+ability_name = "Resentment"
+ability_range = NodePath("DiamondRange")
+status_infliction = ExtResource("2_r4487")
+
+[node name="DiamondRange" parent="." unique_id=1447504178 instance=ExtResource("3_mrsey")]

@@ -80,6 +80,7 @@ func update_status_bar(target: Character, is_player: bool) -> void:
 		working_status_bar = player_statuses
 	for i in working_status_bar.get_children():
 		i.queue_free()
+	print(target.status_effects)
 	for i in target.status_effects:
 		var new_status := status_icon.instantiate()
 		
@@ -91,3 +92,7 @@ func update_status_bar(target: Character, is_player: bool) -> void:
 
 func _on_signal_bus_status_update(target: Character, is_player: bool) -> void:
 	update_status_bar(target, is_player)
+
+
+func _on_signal_bus_adr_update(value: float, max_value: float) -> void:
+	update_adrenaline(value, max_value)

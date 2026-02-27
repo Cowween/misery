@@ -1,0 +1,10 @@
+[gd_scene format=3 uid="uid://dlr5jkdyxivdm"]
+
+[ext_resource type="Script" uid="uid://yfxse68po2aw" path="res://Scripts/generic_status_test.gd" id="1_x3sea"]
+[ext_resource type="PackedScene" uid="uid://db1knfwyv5ukh" path="res://Scenes/Attacks/Ranges/diamond_range.tscn" id="3_770ls"]
+
+[node name="GenericStatusTest" type="Node" unique_id=1870127254 node_paths=PackedStringArray("ability_range")]
+script = ExtResource("1_x3sea")
+ability_range = NodePath("DiamondRange")
+
+[node name="DiamondRange" parent="." unique_id=1447504178 instance=ExtResource("3_770ls")]

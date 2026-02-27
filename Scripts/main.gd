@@ -42,6 +42,7 @@ func _ready() -> void:
 	# UI Updates
 	battle_ui.update_ap(current.action_points)
 	battle_ui.update_p_health(current.max_hp, current.hp)
+	battle_ui.update_adrenaline(current.adrenaline, current.max_adr)
 	
 	# Camera Setup
 	$CameraContainer.position = current.position
@@ -295,5 +296,6 @@ func _on_signal_bus_action_done() -> void:
 	pivot.basis = current.basis
 	$CameraContainer.position = current._path_follow.global_position
 	battle_ui.update_p_health(current.hp, current.max_hp)
+	battle_ui.update_adrenaline(current.adrenaline, current.max_adr)
 	
 	state_machine.change_state("SelectionState")

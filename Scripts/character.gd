@@ -11,13 +11,15 @@ const DIRECTIONS = [Vector3.LEFT, Vector3.RIGHT, Vector3.FORWARD, Vector3.BACK]
 @export var option_menu_offset := Vector2(10,10)
 
 #==STATS==
-@export var agility := 100
+@export var agility := 100.0
 @export var ap_per_turn = 5
 @export var max_hp = 100.0
 @export var atk_range := 2
-@export var atk := 3
-@export var def := 10
-@export var crit_rate := 2
+@export var atk := 3.0
+@export var def := 10.0
+@export var crit_rate := 2.0
+@export var initial_adr := 0.0
+@export var max_adr := 150.0
 
 #==ABILIITIES==
 @export var attack_abilities : Array[Ability] = []
@@ -33,11 +35,12 @@ var current_basis = Vector3()
 var is_walking = false : set = set_is_walking
 var hp = max_hp: set =set_hp
 var walking_ap := 0
-var adrenaline := 0
+var adrenaline := 0.0
 var speed := 5
 var status_effects : Array[StatusEffect]
-var atk_mult := 1
-var atk_add := 0
+var atk_mult := 1.0
+var atk_add := 0.0
+var is_current := false
 @onready var _path_follow = $PathFollow3D
 		
 func set_cell(value: Vector3) -> void:
@@ -45,7 +48,10 @@ func set_cell(value: Vector3) -> void:
 	
 func set_hp(value: float) -> void:
 	hp = value
-	signal_bus.hp_update.emit(value)
+	if hp >= max_hp:
+		hp = max_hp
+	if is_current:
+		signal_bus.hp_update.emit(value)
 	
 func set_is_walking(value: bool) -> void:
 	is_walking = value
@@ -57,15 +63,26 @@ func set_action_points(value: int) -> void:
 	signal_bus.ap_update.emit(value)
 	if action_points == 0:
 		signal_bus.action_done.emit()
+
+func set_adrenaline(value: float) -> void:
+	adrenaline = value
+	if adrenaline >= max_adr:
+		adrenaline = max_adr
+	if adrenaline <= 0:
+		adrenaline = 0
+	if is_current:
+		signal_bus.adr_update.emit(value, max_adr)
 	
 func turn_start() -> void:
 	#connected to  main turn start
 	for i in status_effects:
 		i.on_turn_start()
+	is_current = true
 	status_update(true)
 
 func turn_end() -> void:
 	#connected to main turn end
+	is_current = false
 	for i in status_effects:
 		i.on_turn_end()
 	

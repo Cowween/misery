@@ -4,6 +4,7 @@ class_name RestraintEffect
 var ADR_add := 1
 
 func on_apply(target: Character) -> void:
+	target.status_effects.append(self)
 	victim = target
 	victim.adrenaline += ADR_add
 	

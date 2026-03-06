@@ -6,6 +6,7 @@ var atk_mult := 0.2
 func on_apply(target: Character) -> void:
 	victim = target
 	victim.atk_mult += atk_mult
+	target.status_effects.append(self)
 	
 func add_stack() -> void:
 	super.add_stack()

@@ -110,6 +110,7 @@ layout_mode = 2
 size_flags_horizontal = 3
 
 [node name="PlayerStatuses" type="HBoxContainer" parent="." unique_id=185924381]
+layout_direction = 2
 layout_mode = 0
 offset_left = 329.0
 offset_top = 560.0
@@ -118,16 +119,35 @@ offset_bottom = 600.0
 
 [node name="Status" parent="PlayerStatuses" unique_id=229806799 instance=ExtResource("3_xs5rh")]
 layout_mode = 2
-size_flags_horizontal = 2
+size_flags_horizontal = 0
+
+[node name="Status2" parent="PlayerStatuses" unique_id=567674713 instance=ExtResource("3_xs5rh")]
+layout_mode = 2
 
 [node name="EnemyStatuses" type="HBoxContainer" parent="." unique_id=1055753545]
+layout_direction = 3
 layout_mode = 0
-offset_left = 61.0
-offset_top = 25.0
-offset_right = 731.0
-offset_bottom = 65.0
+offset_left = 423.0
+offset_top = 23.0
+offset_right = 1093.0
+offset_bottom = 63.0
 
 [node name="Status" parent="EnemyStatuses" unique_id=1260644551 instance=ExtResource("3_xs5rh")]
+custom_minimum_size = Vector2(40, 40)
+layout_direction = 3
+layout_mode = 2
+
+[node name="Status2" parent="EnemyStatuses" unique_id=1214537150 instance=ExtResource("3_xs5rh")]
+custom_minimum_size = Vector2(40, 40)
+layout_direction = 3
+layout_mode = 2
+
+[node name="Status3" parent="EnemyStatuses" unique_id=747674348 instance=ExtResource("3_xs5rh")]
+layout_direction = 3
+layout_mode = 2
+
+[node name="Status4" parent="EnemyStatuses" unique_id=1418000882 instance=ExtResource("3_xs5rh")]
+layout_direction = 3
 layout_mode = 2
 
 [connection signal="pressed" from="PlayerInfo/FunctionalButtons/Attack" to="." method="_on_attack_pressed"]

@@ -12,10 +12,7 @@ func initialise(next_color : Color, is_player : bool, status_name: String, stack
 	stacks_count.text = str(stacks)
 	s_name = status_name
 	duration_text.text = str(duration)
-	if is_player:
-		size_flags_horizontal = SIZE_EXPAND + SIZE_SHRINK_BEGIN
-	else:
-		size_flags_horizontal = SIZE_EXPAND + SIZE_SHRINK_END
+	tooltip_text = status_name + " " + str(stacks) + " stacks" + " " + str(duration) + " turns left"
 
 func add_stacks() -> void:
 	no_of_stacks += 1

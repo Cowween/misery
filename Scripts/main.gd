@@ -12,7 +12,7 @@ const DIRECTIONS = [Vector3.LEFT, Vector3.RIGHT, Vector3.FORWARD, Vector3.BACK]
 @onready var battle_ui := $"UI elements/BattleUI"
 @onready var attack_interface := $"UI elements/attack_interface"
 
-var occupied_tiles := {} 
+var occupied_tiles := {} #In the format of Character: Cell
 # Initiative variables
 var queue := []
 var queue_in_action := []

@@ -6,7 +6,7 @@
 custom_minimum_size = Vector2(40, 4)
 offset_right = 40.0
 offset_bottom = 40.0
-size_flags_horizontal = 10
+size_flags_horizontal = 8
 color = Color(0.44909894, 0.02993426, 0.019484315, 1)
 script = ExtResource("1_x4d6w")
 

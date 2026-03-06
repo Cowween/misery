@@ -80,7 +80,7 @@ func update_status_bar(target: Character, is_player: bool) -> void:
 		working_status_bar = player_statuses
 	for i in working_status_bar.get_children():
 		i.queue_free()
-	print(target.status_effects)
+	#print(target.status_effects)
 	for i in target.status_effects:
 		var new_status := status_icon.instantiate()
 		

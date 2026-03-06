@@ -6,9 +6,10 @@ class_name ForgivenessEffect
 # Called when the node enters the scene tree for the first time.
 func on_apply(target: Character) -> void:
 	victim = target
+	
 	var no_of_statuses = victim.status_effects.size()
-	for i in victim.status_effects:
-		i.on_remove()
+	victim.status_effects.clear()
+	target.status_effects.append(self)
 	victim.hp -= no_of_statuses * atk
 	
 func on_remove() -> void:

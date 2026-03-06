@@ -78,7 +78,7 @@ func turn_start() -> void:
 	for i in status_effects:
 		i.on_turn_start()
 	is_current = true
-	status_update(true)
+	status_update()
 
 func turn_end() -> void:
 	#connected to main turn end
@@ -86,11 +86,8 @@ func turn_end() -> void:
 	for i in status_effects:
 		i.on_turn_end()
 	
-func status_update(self_inflicted: bool) -> void:
-	if self_inflicted:
-		signal_bus.emit_signal("status_update", self, true)
-	else:
-		signal_bus.emit_signal("status_update", self, false)
+func status_update() -> void:
+	signal_bus.emit_signal("status_update", self, is_current)
 
 func initialise() -> void:
 	action_points = ap_per_turn

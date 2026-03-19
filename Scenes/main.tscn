@@ -25,6 +25,7 @@
 [ext_resource type="PackedScene" uid="uid://culgnw67d68rx" path="res://Scenes/Statuses/forgiveness_effect.tscn" id="18_cbgmd"]
 [ext_resource type="PackedScene" uid="uid://bao4oc6m47qie" path="res://Scenes/Statuses/avarice_effect.tscn" id="18_u50mg"]
 [ext_resource type="PackedScene" uid="uid://dl84svupqw8qx" path="res://Scenes/StateMachine/battle_state_machine.tscn" id="19_fevyy"]
+[ext_resource type="PackedScene" uid="uid://bq68f7evoqgn7" path="res://Scenes/AI/ai_character.tscn" id="26_cbgmd"]
 
 [node name="Main" type="Node" unique_id=197013863 node_paths=PackedStringArray("state_machine")]
 script = ExtResource("1_w5nr3")
@@ -143,6 +144,13 @@ signal_bus = NodePath("../../SignalBus")
 
 [node name="BattleStateMachine" parent="." unique_id=483840876 node_paths=PackedStringArray("signal_bus") instance=ExtResource("19_fevyy")]
 signal_bus = NodePath("../SignalBus")
+
+[node name="AI" parent="." unique_id=27490163 node_paths=PackedStringArray("attack_abilities") instance=ExtResource("26_cbgmd")]
+initial_cell = Vector3(1, 1, 1)
+cname = "AI1"
+attack_abilities = [NodePath("Slash")]
+
+[node name="Slash" parent="AI" unique_id=1643767841 instance=ExtResource("13_hibaj")]
 
 [connection signal="action_done" from="SignalBus" to="." method="_on_signal_bus_action_done"]
 [connection signal="adr_update" from="SignalBus" to="UI elements/BattleUI" method="_on_signal_bus_adr_update"]

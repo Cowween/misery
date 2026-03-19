@@ -95,7 +95,7 @@ func initialise() -> void:
 func _ready() -> void:
 	
 	for i in attack_abilities:
-		i.ability_owner = self
+		i.set_ability_owner(self)
 		i.set_range(atk_range,  1)
 	for i in special_abilities:
 		i.set_ability_owner(self)
@@ -155,6 +155,8 @@ func walk_along(path: PackedVector3Array) -> void:
 		
 func attack(target: Character, abilityID: int) -> void:
 	#For attack, you pass a character object through the target and deduct its hp
+	if action_points < attack_abilities[abilityID].ap_cost:
+		return
 	_path_follow.look_at(target.position, Vector3(0,1,0), true)
 	attack_abilities[abilityID].execute(target)
 	print("AP cost: ", attack_abilities[abilityID].ap_cost)

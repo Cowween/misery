@@ -23,6 +23,8 @@ var dragging := false
 var cursor_pos := Vector3()
 var attack_zone := [] # Stores just the red tiles now
 var current_target : Character
+var focus_target := false
+var current_range : Array[Vector3]
 
 # == INITIALIZATION ==
 func _ready() -> void:
@@ -49,7 +51,9 @@ func _ready() -> void:
 	pivot.basis = current.basis
 	
 	# Battle State
+	state_machine.initialise()
 	state_machine.signal_bus = $SignalBus
+
 
 # == MAIN LOOP ==
 func _process(_delta: float) -> void:
@@ -59,14 +63,15 @@ func _process(_delta: float) -> void:
 	$Cursor.position = grid.calculate_map_position(cursor_pos + cursor_offset)
 	
 	# 2. Hover Info (Always Active)
-	if cursor_pos in occupied_tiles.values():
-		var target : Character = occupied_tiles.find_key(cursor_pos)
-		battle_ui.display_enemy_info(target)
-	else:
-		battle_ui.hide_enemy_info()
+	if not focus_target:
+		if cursor_pos in occupied_tiles.values():
+			var target : Character = occupied_tiles.find_key(cursor_pos)
+			battle_ui.display_enemy_info(target)
+		else:
+			battle_ui.hide_enemy_info()
 
 	# 3. Path Drawing (Only if ArrowMap is active)
-	if $ArrowMap._pathfinder:
+	if $ArrowMap._pathfinder and current.is_in_group("Player"):
 		var nearest_no_occupy = cursor_pos
 		if is_occupied(cursor_pos):
 			nearest_no_occupy = get_nearest_surrounding_tile(current.cell, cursor_pos)
@@ -100,7 +105,7 @@ func overlay_draw(cells: Array[Vector3], id: int) -> void:
 
 # Called by MoveSelectionState
 # REFACTORED: Now splits movement calculation from range expansion
-func select_unit_for_movement(cell: Vector3) -> void:
+func select_unit_for_movement(cell: Vector3, draw_overlay:=true) -> void:
 	if cell != current.cell: return
 	
 	# A. Get Movement Grid (Blue Tiles)
@@ -127,18 +132,21 @@ func select_unit_for_movement(cell: Vector3) -> void:
 
 	# D. Draw Overlays
 	$Overlay.clear()
-	for t in valid_move_tiles:
-		$Overlay.set_cell_item(t, 0) # 0 = Blue
-	
-	attack_zone = red_tiles
-	for t in red_tiles:
-		$Overlay.set_cell_item(t, 1) # 1 = Red
+	if draw_overlay:
+		
+		for t in valid_move_tiles:
+			$Overlay.set_cell_item(t, 0) # 0 = Blue
+		
+		attack_zone = red_tiles
+		for t in red_tiles:
+			$Overlay.set_cell_item(t, 1) # 1 = Red
 
 	# E. Initialize Pathfinding
-	var points := []
+	var points : Array[Vector3] = []
 	for t in valid_move_tiles:
 		if not is_occupied(t):
 			points.append(t)
+	current_range = points
 	$ArrowMap.initialise(points)
 
 # Called by SelectionState / MoveSelectionState

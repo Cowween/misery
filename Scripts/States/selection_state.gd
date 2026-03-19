@@ -6,7 +6,8 @@ func enter(_msg: Dictionary = {}) -> void:
 	print("Selection state")
 	main.deselect_unit_for_movement() 
 	main.attack_mode(false)
-	
+	if not main.current.is_in_group("Player"):
+		state_machine.change_state("AIState")
 	if not signal_bus.is_connected("special_pressed", _on_special_pressed):
 		signal_bus.special_pressed.connect(_on_special_pressed)
 
@@ -23,6 +24,14 @@ func handle_input(event: InputEvent) -> void:
 			state_machine.change_state("MoveSelectionState")
 			return
 		
+		if cursor_pos in main.occupied_tiles.values():
+			main.focus_target = true
+			var target : Character = main.occupied_tiles.find_key(cursor_pos)
+			main.battle_ui.display_enemy_info(target)
+			
+	if event.is_action_pressed("right_click"):
+		main.focus_target = false
+		main.battle_ui.hide_enemy_info()
 		# 2. Select Enemy -> (Optional) Target Mode without moving?
 		# For now, we stick to your logic: Clicking an enemy here just inspects them (handled by Main._process)
 

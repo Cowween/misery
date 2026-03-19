@@ -7,7 +7,7 @@ var current_state: BattleState
 var states: Dictionary = {}
 @export var signal_bus : SignalBus
 
-func _ready() -> void:
+func initialise() -> void:
 	# Find the Main node (assuming StateMachine is a child of Main)
 	var main_node = get_parent()
 	

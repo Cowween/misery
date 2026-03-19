@@ -12,6 +12,10 @@ var ability_owner: Character
 
 @abstract func execute(target: Character) -> void
 
+func set_ability_owner(owner: Character) -> void:
+	ability_owner = owner
+	ability_range.actor = owner
+
 func inflict_status(target: Character, status_name: String) -> void:
 	for i in target.status_effects:
 		if i.status_name == status_name:

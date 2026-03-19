@@ -3,7 +3,7 @@ class_name DiamondRange
 
 func get_tiles_in_range(origin: Variant = null, _direction: Vector3 = Vector3.FORWARD) -> Array[Vector3]:
 	var tiles: Array[Vector3] = []
-	
+	print(actor)
 	# 1. Resolve Start Point
 	var start_point: Vector3
 	if origin != null:

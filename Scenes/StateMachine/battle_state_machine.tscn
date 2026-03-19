@@ -6,6 +6,7 @@
 [ext_resource type="Script" uid="uid://ceog5qjmvg3iw" path="res://Scripts/States/moving_state.gd" id="4_ev8dc"]
 [ext_resource type="Script" uid="uid://bnnhxovegfxr7" path="res://Scripts/States/selection_state.gd" id="5_775mr"]
 [ext_resource type="Script" uid="uid://r0v2h6siuflc" path="res://Scripts/States/special_selection_state.gd" id="6_x27l0"]
+[ext_resource type="Script" uid="uid://c3xp8604ifufv" path="res://Scripts/States/ai_state.gd" id="7_okcq5"]
 
 [node name="BattleStateMachine" type="Node" unique_id=483840876 node_paths=PackedStringArray("initial_state")]
 script = ExtResource("1_rj4wl")
@@ -27,3 +28,6 @@ metadata/_custom_type_script = "uid://bd83hweinfd4c"
 [node name="SpecialSelectionState" type="Node" parent="." unique_id=966135972]
 script = ExtResource("6_x27l0")
 metadata/_custom_type_script = "uid://bd83hweinfd4c"
+
+[node name="AIState" type="Node" parent="." unique_id=1111053924]
+script = ExtResource("7_okcq5")

@@ -18,6 +18,12 @@ func _process(delta: float) -> void:
 func initialise(walkable_cells: Array) -> void:
 	_pathfinder = PathFinder.new(grid, walkable_cells)
 	
+func get_path_only(path_start: Vector3, path_end: Vector3, path_size := 0) -> void :
+	clear()
+	current_path = _pathfinder.calculate_point_path(path_start, path_end)
+	if path_size != 0 and current_path.size() > path_size + 1:
+		current_path.resize(path_size+1)
+	
 func draw(path_start: Vector3, path_end: Vector3, path_size := 0, is_occupied:=false) -> void:
 	clear()
 	current_path = _pathfinder.calculate_point_path(path_start, path_end)

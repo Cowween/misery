@@ -50,6 +50,8 @@ func set_hp(value: float) -> void:
 	hp = value
 	if hp >= max_hp:
 		hp = max_hp
+	if hp <= 0:
+		die()
 	if is_current:
 		signal_bus.hp_update.emit(value)
 	
@@ -163,4 +165,6 @@ func attack(target: Character, abilityID: int) -> void:
 	action_points = action_points - attack_abilities[abilityID].ap_cost
 	
 
-	
+func die() -> void:
+	signal_bus.unit_death.emit(self)
+	queue_free()

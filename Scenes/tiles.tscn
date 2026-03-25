@@ -2,7 +2,8 @@
 
 [ext_resource type="Texture2D" uid="uid://dkiv8rdd2oxol" path="res://Assets/icon.svg" id="1_i22iv"]
 [ext_resource type="Texture2D" uid="uid://daovyp8lu56ac" path="res://Assets/tile.png" id="2_rinnr"]
-[ext_resource type="PackedScene" uid="uid://qxvv3m0kd22f" path="res://TestAssets/Pieces/ground.fbx" id="3_1nd0u"]
+[ext_resource type="ArrayMesh" uid="uid://c2k1k1qdowtru" path="res://KayKit_Prototype_Bits_1.1_FREE/Assets/obj/Floor.obj" id="3_fdbhl"]
+[ext_resource type="ArrayMesh" uid="uid://caoaoxvgkhbfg" path="res://KayKit_Prototype_Bits_1.1_FREE/Assets/obj/Primitive_Stairs.obj" id="4_idipg"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_512xe"]
 albedo_texture = ExtResource("1_i22iv")
@@ -18,6 +19,12 @@ albedo_texture = ExtResource("2_rinnr")
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_j4ee8"]
 material = SubResource("StandardMaterial3D_7d5se")
+
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_4uhnv"]
+points = PackedVector3Array(-2.031746, -0.03174603, -2.0317461, 1.9680436, 0.53968257, 1.9681048, -2.031746, -0.03174603, 2.0317461, 2.031684, -0.03174603, -2.0317461, -1.9681058, 0.53968257, -1.9681048, -1.9681058, 0.53968257, 1.9681048, 1.9680436, 0.53968257, -1.9681048, 2.031684, -0.03174603, 2.0317461)
+
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_73hcg"]
+points = PackedVector3Array(-1.9999014, 0.00054271234, -2, 2.031746, 0.53990936, 2.0317461, -1.4600829, 4.031348, 2.0317461, 2.031746, 0.53990936, -2.0317461, -1.9999014, 3.9996064, -2, -1.9999014, 0.00054271234, 2, 2, 0.00015178409, -1.9999994, 2, 0.00015178409, 1.9999994, -1.9999014, 3.9996064, 2, -1.4600829, 4.031348, -2.0317461, 0.6249365, 0.00015124398, -2)
 
 [node name="Tiles" type="Node3D" unique_id=982418080]
 
@@ -43,7 +50,24 @@ shape = SubResource("ConvexPolygonShape3D_mkgt0")
 
 [node name="Center" type="Node3D" parent="NormalTile2" unique_id=966577838]
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1980251912]
+[node name="Floor" type="MeshInstance3D" parent="." unique_id=1536978953]
+transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 5.013, -1, 0)
+mesh = ExtResource("3_fdbhl")
 
-[node name="ground" parent="." unique_id=1618548421 instance=ExtResource("3_1nd0u")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.6491337, 0, 1.9885683)
+[node name="StaticBody3D" type="StaticBody3D" parent="Floor" unique_id=1865015227]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Floor/StaticBody3D" unique_id=911223874]
+shape = SubResource("ConvexPolygonShape3D_4uhnv")
+
+[node name="Center" type="Node3D" parent="Floor" unique_id=1902520145]
+
+[node name="Stairs" type="MeshInstance3D" parent="." unique_id=54856096]
+transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 9.98, -1, 0)
+mesh = ExtResource("4_idipg")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="Stairs" unique_id=177543243]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Stairs/StaticBody3D" unique_id=1569769833]
+shape = SubResource("ConvexPolygonShape3D_73hcg")
+
+[node name="Center" type="Node3D" parent="Stairs" unique_id=356086933]

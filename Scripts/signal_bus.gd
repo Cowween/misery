@@ -11,6 +11,7 @@ signal turn_start
 signal turn_end
 signal status_update(target: Character, is_player: bool)
 signal adr_update(value: float, max_value: float)
+signal unit_death(unit: Character)
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:

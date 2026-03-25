@@ -307,3 +307,9 @@ func _on_signal_bus_action_done() -> void:
 	battle_ui.update_adrenaline(current.adrenaline, current.max_adr)
 	
 	state_machine.change_state("SelectionState")
+
+
+func _on_signal_bus_unit_death(unit: Character) -> void:
+	occupied_tiles.erase(unit)
+	queue.erase(unit)
+	queue_in_action.erase(unit)

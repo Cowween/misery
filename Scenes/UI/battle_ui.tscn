@@ -150,5 +150,12 @@ layout_mode = 2
 layout_direction = 3
 layout_mode = 2
 
+[node name="DebugCursorPos" type="Label" parent="." unique_id=2045546484]
+layout_mode = 0
+offset_left = 901.0
+offset_top = 597.0
+offset_right = 1140.0
+offset_bottom = 635.0
+
 [connection signal="pressed" from="PlayerInfo/FunctionalButtons/Attack" to="." method="_on_attack_pressed"]
 [connection signal="pressed" from="PlayerInfo/FunctionalButtons/Turn" to="." method="_on_turn_pressed"]

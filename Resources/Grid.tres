@@ -4,4 +4,4 @@
 
 [resource]
 script = ExtResource("1_gaed3")
-cell_size = Vector3(2, 1, 2)
+cell_size = Vector3(2, 2, 2)

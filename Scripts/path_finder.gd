@@ -2,19 +2,16 @@ extends Node
 class_name PathFinder
 
 const DIRECTIONS = [Vector3.BACK, Vector3.FORWARD, Vector3.LEFT, Vector3.RIGHT]
+const MAX_STEP_HEIGHT = 1 # Defines how steep a slope a unit can climb
 
 var _grid: Resource
-
 var _astar := AStar3D.new()
 
 func _init(grid: Grid, walkable_cells: Array) -> void:
-	
 	_grid = grid
-	
 	var cell_mapping := {}
 	for cell in walkable_cells:
 		cell_mapping[cell] = _grid.as_index(cell)
-		
 	_add_and_connect_points(cell_mapping)
 	
 func calculate_point_path(start: Vector3, end: Vector3) -> PackedVector3Array:
@@ -34,15 +31,17 @@ func _add_and_connect_points(cell_mappings: Dictionary) -> void:
 		for neighbour_index in find_neighbouring_indices(point,cell_mappings):
 			_astar.connect_points(cell_mappings[point], neighbour_index)
 	
-	
 func find_neighbouring_indices(cell: Vector3, cell_mappings: Dictionary) -> Array:
 	var out := []
-	
 	for direction in DIRECTIONS:
-		var neighbour: Vector3 = cell + direction
-		if not cell_mappings.has(neighbour):
-			continue
-		
-		if not _astar.are_points_connected(cell_mappings[cell], cell_mappings[neighbour]):
-			out.push_back(cell_mappings[neighbour])
+		# ORDER MATTERS: Check flat first (0), then up (1), then down (-1)
+		for y_offset in [0, 1, -1]:
+			var neighbour: Vector3 = cell + direction + Vector3(0, y_offset, 0)
+			
+			if not cell_mappings.has(neighbour): continue
+			
+			if not _astar.are_points_connected(cell_mappings[cell], cell_mappings[neighbour]):
+				out.push_back(cell_mappings[neighbour])
+				
+			break # Found the connected floor tile, stop checking other heights in this column
 	return out

@@ -1,54 +1,48 @@
 extends Resource
 class_name Grid
-@export var size := Vector2(20,20)
-# The size of a cell in pixels.
-@export var cell_size := Vector3(2, 2, 2)
-@export var height := 2
 
-# Half of ``cell_size``.
-# We will use this to calculate the center of a grid cell in pixels, on the screen.
-# That's how we can place units in the center of a cell.
+# 1. Change size to Vector3! (Width, Height, Depth)
+@export var size := Vector3(20, 20, 20) 
+var cell_size := Vector3(2, 2, 2) : set = on_cell_size
+
+func on_cell_size(value):
+	print("Change from", cell_size, "to", value)
+	print_stack()
+	cell_size = value
+	
+
+
 var _half_cell_size = cell_size / 2
 
 func calculate_map_position(grid_position: Vector3) -> Vector3:
-	return grid_position * cell_size + _half_cell_size - Vector3.UP*height
+	# Calculate the exact world position
+	#print(cell_size)
+	return Vector3(
+		grid_position.x * cell_size.x + _half_cell_size.x,
+		grid_position.y * cell_size.y + cell_size.y, # Use full height to reach the 'roof'
+		grid_position.z * cell_size.z + _half_cell_size.z
+	)
 
-
-# Returns the coordinates of the cell on the grid given a position on the map.
-# This is the complementary of `calculate_map_position()` above.
-# When designing a level, you'll place units visually in the editor. We'll use this function to find
-# the grid coordinates they're placed on, and call `calculate_map_position()` to snap them to the
-# cell's center.
 func calculate_grid_coordinates(map_position: Vector3) -> Vector3:
-	return (map_position / cell_size).floor()
+	# We subtract half the cell's height so the top surface registers as the block underneath it
+	var adjusted_pos = map_position - Vector3(0, _half_cell_size.y, 0)
+	# Add a tiny epsilon (0.01) to prevent floating point rounding errors on the edges
+	return (adjusted_pos / cell_size).floor()
 
-
-# Returns true if the `cell_coordinates` are within the grid.
-# This method and the following one allow us to ensure the cursor or units can never go past the
-# map's limit.
+# 2. Update bounds to check X, Y, AND Z
 func is_within_bounds(cell_coordinates: Vector3) -> bool:
 	var out := cell_coordinates.x >= 0 and cell_coordinates.x < size.x
-	return out and cell_coordinates.z >= 0 and cell_coordinates.z < size.y
+	out = out and cell_coordinates.z >= 0 and cell_coordinates.z < size.z
+	return out and cell_coordinates.y >= 0 and cell_coordinates.y < size.y
 
-
-# Makes the `grid_position` fit within the grid's bounds.
-# This is a clamp function designed specifically for our grid coordinates.
-# The Vector2 class comes with its `Vector2.clamp()` method, but it doesn't work the same way: it
-# limits the vector's length instead of clamping each of the vector's components individually.
-# That's why we need to code a new method.
+# 3. Update clamp to clamp X, Y, AND Z
 func clamp(grid_position: Vector3) -> Vector3:
 	var out := grid_position
 	out.x = clamp(out.x, 0, size.x - 1.0)
-	out.z = clamp(out.z, 0, size.y - 1.0)
+	out.y = clamp(out.y, 0, size.y - 1.0)
+	out.z = clamp(out.z, 0, size.z - 1.0)
 	return out
 
-
-# Given Vector2 coordinates, calculates and returns the corresponding integer index. You can use
-# this function to convert 2D coordinates to a 1D array's indices.
-#
-# There are two cases where you need to convert coordinates like so:
-# 1. We'll need it for the AStar algorithm, which requires a unique index for each point on the
-# graph it uses to find a path.
-# 2. You can use it for performance. More on that below.
+# 4. Make the index true 3D so paths don't overwrite each other
 func as_index(cell: Vector3) -> int:
-	return int(cell.x + size.x * cell.z)
+	return int(cell.x + (size.x * cell.z) + (size.x * size.z * cell.y))

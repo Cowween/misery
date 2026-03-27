@@ -1,11 +1,8 @@
 extends GridMap
 
-
-# Called when the node enters the scene tree for the first time.
-func _ready() -> void:
-	pass
-
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta: float) -> void:
-	pass
+# Generates the list of placed tiles
+func get_walkable_cells() -> Array[Vector3]:
+	var walkable_cells : Array[Vector3] = []
+	for cell in get_used_cells():
+		walkable_cells.append(Vector3(cell))
+	return walkable_cells

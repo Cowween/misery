@@ -11,7 +11,10 @@ const DIRECTIONS = [Vector3.LEFT, Vector3.RIGHT, Vector3.FORWARD, Vector3.BACK]
 @onready var pivot := $CameraContainer/CameraPivot
 @onready var battle_ui := $"UI elements/BattleUI"
 @onready var attack_interface := $"UI elements/attack_interface"
+@onready var debug_cursor := $"UI elements/BattleUI/DebugCursorPos"
+@onready var ground := $Ground
 
+var walkable_cells : Array[Vector3] = []
 var occupied_tiles := {} #In the format of Character: Cell
 # Initiative variables
 var queue := []
@@ -29,11 +32,12 @@ var current_range : Array[Vector3]
 # == INITIALIZATION ==
 func _ready() -> void:
 	# Initiative Setup
+	walkable_cells = ground.get_walkable_cells()
 	queue = get_tree().get_nodes_in_group("Characters")
 	queue.sort_custom(sort_queue)
 	for i in queue:
 		i.signal_bus = $SignalBus
-		occupied_tiles[i] = grid.calculate_grid_coordinates(Vector3i(i.position.x, 0, i.position.z))
+		occupied_tiles[i] = grid.calculate_grid_coordinates(i.global_position)
 	
 	queue_in_action = queue.duplicate()
 	current = queue_in_action.pop_front()
@@ -58,10 +62,24 @@ func _ready() -> void:
 # == MAIN LOOP ==
 func _process(_delta: float) -> void:
 	# 1. Global Cursor Tracking
-	cursor_pos = grid.calculate_grid_coordinates(camera.get_cursor_world_position())
-	cursor_pos = grid.clamp(cursor_pos)
-	$Cursor.position = grid.calculate_map_position(cursor_pos + cursor_offset)
+	var raw_pos = grid.calculate_grid_coordinates(camera.get_cursor_world_position())
+	raw_pos = grid.clamp(raw_pos)
 	
+	# NEW: Force cursor to snap to the nearest actual floor tile height
+	var snapped = false
+	for y_offset in range(-2, 3): # Check slightly above and below the mouse hit
+		var check_pos = Vector3(raw_pos.x, raw_pos.y + y_offset, raw_pos.z)
+		if walkable_cells.has(check_pos):
+			cursor_pos = check_pos
+			snapped = true
+			break
+			
+	# Fallback if no floor is under the mouse
+	if not snapped:
+		cursor_pos = raw_pos
+
+	$Cursor.position = grid.calculate_map_position(cursor_pos) + cursor_offset
+	debug_cursor.text = str($Cursor.position) + ", " + str(cursor_pos)
 	# 2. Hover Info (Always Active)
 	if not focus_target:
 		if cursor_pos in occupied_tiles.values():
@@ -143,6 +161,7 @@ func select_unit_for_movement(cell: Vector3, draw_overlay:=true) -> void:
 
 	# E. Initialize Pathfinding
 	var points : Array[Vector3] = []
+	print(valid_move_tiles)
 	for t in valid_move_tiles:
 		if not is_occupied(t):
 			points.append(t)
@@ -212,21 +231,26 @@ func get_movement_grid(start_cell: Vector3, ap: int) -> Dictionary:
 		var curr = queue.pop_front()
 		var current_ap = move_grid[curr]
 		
-		if current_ap <= 0:
-			continue
+		if current_ap <= 0: continue
 
 		for direction in DIRECTIONS:
-			var next = curr + direction
-			
-			if not grid.is_within_bounds(next): continue
-			if is_occupied(next): continue # Block movement through units
-			
-			# Cost logic (can be expanded for terrain)
-			var next_ap = current_ap - 1 
-			
-			if not move_grid.has(next) or next_ap > move_grid[next]:
-				move_grid[next] = next_ap
-				queue.append(next)
+			# ORDER MATTERS: Check flat first (0), then up (1), then down (-1)
+			for y_offset in [0, 1, -1]:
+				var next = curr + direction + Vector3(0, y_offset, 0)
+				
+				if not grid.is_within_bounds(next): continue
+				if not walkable_cells.has(next): continue 
+				if is_occupied(next): continue 
+				
+				var next_ap = current_ap - 1 
+				
+				if not move_grid.has(next) or next_ap > move_grid[next]:
+					move_grid[next] = next_ap
+					queue.append(next)
+					
+				# Break out of the Y loop once we've successfully mapped a floor tile here
+				if walkable_cells.has(next):
+					break
 				
 	return move_grid
 
@@ -288,8 +312,7 @@ func _on_signal_bus_action_done() -> void:
 	if queue_in_action.size() == 0:
 		queue_in_action = queue.duplicate()
 
-	var tile = grid.calculate_grid_coordinates(Vector3i(current.position.x, 0, current.position.z))
-	occupied_tiles[current] = tile
+	occupied_tiles[current] = grid.calculate_grid_coordinates(current.global_position)
 	current.turn_end()
 	
 	# Switch Turn

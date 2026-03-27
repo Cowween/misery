@@ -40,29 +40,36 @@ func draw(path_start: Vector3, path_end: Vector3, path_size := 0, is_occupied:=f
 		#print(cell, prev_cell)
 		#print(cell_pos)
 		if i != 0:
+			# Flatten the direction vectors so height doesn't break rotation
+			var dir_to_prev = (prev_cell - cell)
+			dir_to_prev.y = 0
+			var dir_from_prev = (cell - prev_cell)
+			dir_from_prev.y = 0
+			
 			if cell == current_path[-1]:
-
-				if cell - prev_cell == Vector3(1, 0, 0):
-					rot = rot.rotated(Vector3.UP, -PI/2)
-				elif cell - prev_cell == Vector3(-1, 0, 0):
-					rot = rot.rotated(Vector3.UP, PI/2)
-				elif cell - prev_cell == Vector3(0, 0, 1):
-					rot = rot.rotated(Vector3.UP, PI)
+				if dir_from_prev == Vector3(1, 0, 0): rot = rot.rotated(Vector3.UP, -PI/2)
+				elif dir_from_prev == Vector3(-1, 0, 0): rot = rot.rotated(Vector3.UP, PI/2)
+				elif dir_from_prev == Vector3(0, 0, 1): rot = rot.rotated(Vector3.UP, PI)
+				set_cell_item(cell, 1, get_orthogonal_index_from_basis(rot)) 
+			
+			elif i + 1 < current_path.size():
+				var dir_to_next = (current_path[i+1] - cell)
+				dir_to_next.y = 0
 				
-				set_cell_item(cell, 1, get_orthogonal_index_from_basis(rot)) #22
-			elif ((cell - prev_cell).abs() == Vector3(0,0,1) and (cell - current_path[i+1]).abs() == Vector3(1,0,0)) or ((cell - prev_cell).abs() == Vector3(1,0,0) and (cell - current_path[i+1]).abs() == Vector3(0,0,1)):
+				var is_corner = (dir_from_prev.abs() == Vector3(0,0,1) and dir_to_next.abs() == Vector3(1,0,0)) or (dir_from_prev.abs() == Vector3(1,0,0) and dir_to_next.abs() == Vector3(0,0,1))
 				
-				if (prev_cell - cell == Vector3(-1, 0, 0) and current_path[i+1] - cell == Vector3(0, 0, 1)) or (prev_cell - cell == Vector3(0, 0, 1) and current_path[i+1] - cell == Vector3(-1, 0, 0)):
-					rot = rot.rotated(Vector3.UP, -PI)
-				elif (prev_cell - cell == Vector3(1, 0, 0) and current_path[i+1] - cell == Vector3(0, 0, 1)) or (prev_cell - cell == Vector3(0, 0, 1) and current_path[i+1] - cell == Vector3(1, 0, 0)):
-					rot = rot.rotated(Vector3.UP, -PI/2)
-				elif (prev_cell - cell == Vector3(-1, 0, 0) and current_path[i+1] - cell == Vector3(0, 0, -1)) or (prev_cell - cell == Vector3(0, 0, -1) and current_path[i+1] - cell == Vector3(-1, 0, 0)):
-					rot = rot.rotated(Vector3.UP, PI/2)
-				set_cell_item(cell, 2, get_orthogonal_index_from_basis(rot))
-			else:
-				if cell - prev_cell == Vector3(1,0,0) or cell - prev_cell == Vector3(-1,0,0):
-					rot = rot.rotated(Vector3.UP, PI/2)
-				set_cell_item(cell, 0, get_orthogonal_index_from_basis(rot))
+				if is_corner:
+					if (dir_to_prev == Vector3(-1, 0, 0) and dir_to_next == Vector3(0, 0, 1)) or (dir_to_prev == Vector3(0, 0, 1) and dir_to_next == Vector3(-1, 0, 0)):
+						rot = rot.rotated(Vector3.UP, -PI)
+					elif (dir_to_prev == Vector3(1, 0, 0) and dir_to_next == Vector3(0, 0, 1)) or (dir_to_prev == Vector3(0, 0, 1) and dir_to_next == Vector3(1, 0, 0)):
+						rot = rot.rotated(Vector3.UP, -PI/2)
+					elif (dir_to_prev == Vector3(-1, 0, 0) and dir_to_next == Vector3(0, 0, -1)) or (dir_to_prev == Vector3(0, 0, -1) and dir_to_next == Vector3(-1, 0, 0)):
+						rot = rot.rotated(Vector3.UP, PI/2)
+					set_cell_item(cell, 2, get_orthogonal_index_from_basis(rot))
+				else:
+					if dir_from_prev == Vector3(1,0,0) or dir_from_prev == Vector3(-1,0,0):
+						rot = rot.rotated(Vector3.UP, PI/2)
+					set_cell_item(cell, 0, get_orthogonal_index_from_basis(rot))
 		prev_cell = cell
 	#print(get_used_cells())
 

@@ -2,7 +2,8 @@ extends Resource
 class_name Grid
 @export var size := Vector2(20,20)
 # The size of a cell in pixels.
-@export var cell_size := Vector3(2, 0, 2)
+@export var cell_size := Vector3(2, 2, 2)
+@export var height := 2
 
 # Half of ``cell_size``.
 # We will use this to calculate the center of a grid cell in pixels, on the screen.
@@ -10,7 +11,7 @@ class_name Grid
 var _half_cell_size = cell_size / 2
 
 func calculate_map_position(grid_position: Vector3) -> Vector3:
-	return grid_position * cell_size + _half_cell_size
+	return grid_position * cell_size + _half_cell_size - Vector3.UP*height
 
 
 # Returns the coordinates of the cell on the grid given a position on the map.
@@ -38,7 +39,6 @@ func is_within_bounds(cell_coordinates: Vector3) -> bool:
 func clamp(grid_position: Vector3) -> Vector3:
 	var out := grid_position
 	out.x = clamp(out.x, 0, size.x - 1.0)
-	out.y = 0
 	out.z = clamp(out.z, 0, size.y - 1.0)
 	return out
 

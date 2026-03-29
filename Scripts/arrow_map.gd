@@ -5,6 +5,7 @@ extends GridMap
 var _pathfinder: PathFinder
 
 var current_path := PackedVector3Array()
+var cached_terrain := {}
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -16,7 +17,7 @@ func _process(delta: float) -> void:
 	pass
 
 func initialise(walkable_cells: Array) -> void:
-	_pathfinder = PathFinder.new(grid, walkable_cells)
+	_pathfinder = PathFinder.new(grid, walkable_cells, cached_terrain)
 	
 func get_path_only(path_start: Vector3, path_end: Vector3, path_size := 0) -> void :
 	clear()

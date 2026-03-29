@@ -13,8 +13,11 @@ const DIRECTIONS = [Vector3.LEFT, Vector3.RIGHT, Vector3.FORWARD, Vector3.BACK]
 @onready var attack_interface := $"UI elements/attack_interface"
 @onready var debug_cursor := $"UI elements/BattleUI/DebugCursorPos"
 @onready var ground := $Ground
+@onready var terrain := $Terrain # Your new terrain GridMap
+
 
 var walkable_cells : Array[Vector3] = []
+var cached_terrain_data := {}    # Stores Vector3: rules_dict
 var occupied_tiles := {} #In the format of Character: Cell
 # Initiative variables
 var queue := []
@@ -31,6 +34,13 @@ var current_range : Array[Vector3]
 
 # == INITIALIZATION ==
 func _ready() -> void:
+	
+	_cache_terrain()
+	
+	$ArrowMap.cached_terrain = cached_terrain_data
+	
+	print(cached_terrain_data.get(Vector3(4,0,5)))
+	
 	# Initiative Setup
 	walkable_cells = ground.get_walkable_cells()
 	queue = get_tree().get_nodes_in_group("Characters")
@@ -219,12 +229,19 @@ func character_aiming(enable: bool) -> void:
 
 # == PATHFINDING & UTILS ==
 
+func _cache_terrain() -> void:
+	cached_terrain_data.clear()
+	print(terrain.get_used_cells())
+	for cell in ground.get_used_cells():
+		var v_cell = Vector3(cell)
+		var index = terrain.get_cell_item(cell)
+		cached_terrain_data[v_cell] = grid.get_rules(index)
+
 # NEW: Calculates ONLY movement (Blue Tiles)
 # Replaces the first half of _flood_fill
 func get_movement_grid(start_cell: Vector3, ap: int) -> Dictionary:
-	var move_grid := {} # Stores cell: remaining_ap
+	var move_grid := {} 
 	var queue := [start_cell]
-	
 	move_grid[start_cell] = ap 
 	
 	while not queue.is_empty():
@@ -234,24 +251,33 @@ func get_movement_grid(start_cell: Vector3, ap: int) -> Dictionary:
 		if current_ap <= 0: continue
 
 		for direction in DIRECTIONS:
-			# ORDER MATTERS: Check flat first (0), then up (1), then down (-1)
 			for y_offset in [0, 1, -1]:
 				var next = curr + direction + Vector3(0, y_offset, 0)
 				
 				if not grid.is_within_bounds(next): continue
-				if not walkable_cells.has(next): continue 
+				if not walkable_cells.has(next): continue
+				
+				# 1. Lookup Terrain Rules (Fast)
+				var rules = cached_terrain_data.get(next, grid.get_rules(-1))
+				
+				# 2. Immutability Check
+				if not rules.passable: continue
 				if is_occupied(next): continue 
 				
-				var next_ap = current_ap - 1 
+				# 3. Verticality Check (Abstracted)
+				if next.y != curr.y:
+					var curr_rules = cached_terrain_data.get(curr, grid.get_rules(-1))
+					if not rules.is_stair and not curr_rules.is_stair:
+						continue 
 				
-				if not move_grid.has(next) or next_ap > move_grid[next]:
+				# 4. Apply Cost
+				var next_ap = current_ap - rules.cost 
+				
+				if next_ap >= 0 and (not move_grid.has(next) or next_ap > move_grid[next]):
 					move_grid[next] = next_ap
 					queue.append(next)
 					
-				# Break out of the Y loop once we've successfully mapped a floor tile here
-				if walkable_cells.has(next):
-					break
-				
+				if walkable_cells.has(next): break
 	return move_grid
 
 # Helper to dynamically find the Range Node on the character's active ability

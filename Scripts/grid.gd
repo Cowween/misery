@@ -4,7 +4,17 @@ class_name Grid
 # 1. Change size to Vector3! (Width, Height, Depth)
 @export var size := Vector3(20, 20, 20) 
 var cell_size := Vector3(2, 2, 2) : set = on_cell_size
+const TERRAIN_RULES = {
+	-1: {"cost": 1, "passable": true,  "is_stair": false}, # Normal
+	2:  {"cost": 1, "passable": false, "is_stair": false}, # Impassable
+	1:  {"cost": 2, "passable": true,  "is_stair": false}, # Difficult (-1 Move)
+	0:  {"cost": 1, "passable": true,  "is_stair": true }  # Stairs
+}
 
+# Helper to safely get terrain data for any cell
+func get_rules(terrain_index: int) -> Dictionary:
+	return TERRAIN_RULES.get(terrain_index, TERRAIN_RULES[-1])
+	
 func on_cell_size(value):
 	print("Change from", cell_size, "to", value)
 	print_stack()

@@ -3,8 +3,8 @@ class_name DiamondRange
 
 func get_tiles_in_range(origin: Variant = null, _direction: Vector3 = Vector3.FORWARD) -> Array[Vector3]:
 	var tiles: Array[Vector3] = []
-	print(actor)
-	# 1. Resolve Start Point
+	
+	# 1. Resolve Start Point (Matching your original logic)
 	var start_point: Vector3
 	if origin != null:
 		start_point = origin
@@ -16,30 +16,24 @@ func get_tiles_in_range(origin: Variant = null, _direction: Vector3 = Vector3.FO
 	if not grid:
 		grid = preload("res://Resources/Grid.tres")
 
-	# 2. BFS Logic to find tiles within distance
-	var queue: Array[Vector3] = [start_point]
-	var visited = {start_point: 0}
-	
-	var directions = [Vector3.FORWARD, Vector3.BACK, Vector3.LEFT, Vector3.RIGHT]
+	# 2. Fetch the physical floor tiles from the base class helper
+	var walkable = walkable_cells
 
-	while not queue.is_empty():
-		var current_tile = queue.pop_front()
-		var current_dist = visited[current_tile]
-
-		# Add to results if inside min/max range
-		if current_dist >= min_range and current_dist <= max_range:
-			tiles.append(current_tile)
-
-		# Stop expanding if we hit max range
-		if current_dist >= max_range:
-			continue
-
-		for dir in directions:
-			var next_tile = current_tile + dir
-			
-			# Check bounds
-			if grid.is_within_bounds(next_tile) and not visited.has(next_tile):
-				visited[next_tile] = current_dist + 1
-				queue.append(next_tile)
-	
+	# 3. 3D Volume Scan (Mathematically equivalent to a 3D BFS)
+	for x in range(-max_range, max_range + 1):
+		for z in range(-max_range, max_range + 1):
+			for y in range(-max_range, max_range + 1):
+				
+				# 3D Manhattan Distance: Each step of height (y) costs 1 range
+				var current_dist = abs(x) + abs(y) + abs(z)
+				
+				# Add to results if inside min/max range
+				if current_dist >= min_range and current_dist <= max_range:
+					var target_tile = start_point + Vector3(x, y, z)
+					
+					# "Cast Down" check: Ensure the tile is actually a physical floor
+					# This implicitly acts as your bounds check, since walkable cells are always in bounds
+					if walkable.has(target_tile):
+						tiles.append(target_tile)
+						
 	return tiles

@@ -10,7 +10,11 @@ class_name Ability
 
 var ability_owner: Character
 
+
 @abstract func execute(target: Character) -> void
+
+func set_walkable(walkable_cells: Array[Vector3]) -> void:
+	ability_range.walkable_cells = walkable_cells
 
 func set_ability_owner(owner: Character) -> void:
 	ability_owner = owner

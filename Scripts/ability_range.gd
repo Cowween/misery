@@ -8,6 +8,7 @@ class_name AbilityRange
 # These are usually assigned dynamically by the Ability or Main script
 var actor: Character
 var grid: Resource 
+var walkable_cells: Array[Vector3] = []
 
 # VIRTUAL FUNCTION: Override this in LineRange, ConeRange, etc.
 # origin: If NOT null, we are simulating a position (for drawing the red border).

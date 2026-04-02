@@ -17,6 +17,7 @@ const DIRECTIONS = [Vector3.LEFT, Vector3.RIGHT, Vector3.FORWARD, Vector3.BACK]
 
 
 var walkable_cells : Array[Vector3] = []
+var levels : Array[Vector3]
 var cached_terrain_data := {}    # Stores Vector3: rules_dict
 var occupied_tiles := {} #In the format of Character: Cell
 # Initiative variables
@@ -36,6 +37,7 @@ var current_range : Array[Vector3]
 func _ready() -> void:
 	
 	_cache_terrain()
+	_get_levels()
 	
 	$ArrowMap.cached_terrain = cached_terrain_data
 	
@@ -228,7 +230,11 @@ func character_aiming(enable: bool) -> void:
 		current._path_follow.rotation.z = 0
 
 # == PATHFINDING & UTILS ==
-
+func _get_levels() -> void:
+	for i in range(grid.size.y + 1):
+		levels.append(Vector3(0, i, 0))
+		
+	#print(levels)
 func _cache_terrain() -> void:
 	cached_terrain_data.clear()
 	print(terrain.get_used_cells())
@@ -247,32 +253,34 @@ func get_movement_grid(start_cell: Vector3, ap: int) -> Dictionary:
 	while not queue.is_empty():
 		var curr = queue.pop_front()
 		var current_ap = move_grid[curr]
-		
 		if current_ap <= 0: continue
 
 		for direction in DIRECTIONS:
-			for y_offset in [0, 1, -1]:
+			for y_offset in [0, 1, -1]: # Check flat, then up, then down
 				var next = curr + direction + Vector3(0, y_offset, 0)
 				
 				if not grid.is_within_bounds(next): continue
 				if not walkable_cells.has(next): continue
 				
-				# 1. Lookup Terrain Rules (Fast)
-				var rules = cached_terrain_data.get(next, grid.get_rules(-1))
+				var next_rules = cached_terrain_data.get(next, grid.get_rules(-1))
+				if not next_rules.passable or is_occupied(next): continue
 				
-				# 2. Immutability Check
-				if not rules.passable: continue
-				if is_occupied(next): continue 
+				# --- UNIFIED STAIR & HEIGHT CHECK ---
+				var curr_rules = cached_terrain_data.get(curr, grid.get_rules(-1))
 				
-				# 3. Verticality Check (Abstracted)
-				if next.y != curr.y:
-					var curr_rules = cached_terrain_data.get(curr, grid.get_rules(-1))
-					if not rules.is_stair and not curr_rules.is_stair:
-						continue 
-				
-				# 4. Apply Cost
-				var next_ap = current_ap - rules.cost 
-				
+				# If we are changing height OR interacting with a stair block
+				if next.y != curr.y or curr_rules.is_stair or next_rules.is_stair:
+					# Valid move only if:
+					# 1. Stair to Stair
+					# 2. Stair to Entrance
+					# 3. Entrance to Stair
+					var valid = (curr_rules.is_stair and (next_rules.is_stair or next_rules.is_entrance)) or \
+								(next_rules.is_stair and (curr_rules.is_stair or curr_rules.is_entrance))
+					
+					if not valid: continue 
+				# ------------------------------------
+
+				var next_ap = current_ap - next_rules.cost
 				if next_ap >= 0 and (not move_grid.has(next) or next_ap > move_grid[next]):
 					move_grid[next] = next_ap
 					queue.append(next)
@@ -302,17 +310,26 @@ func find_edge_tiles(tiles: Array) -> Array:
 
 func get_nearest_surrounding_tile(start: Vector3, end: Vector3) -> Vector3:
 	var dist := 9223372036854775807.0
-	var result := start # Default to start to avoid null errors
+	var lowest_result := start # Default to start to avoid null errors
+	var shortest_result := start
 	for dir in DIRECTIONS:
-		var temp = end + dir
-		if is_occupied(temp): continue
-		if not grid.is_within_bounds(temp): continue # Safety check
-		
-		var d = start.distance_to(temp)
-		if d < dist:
-			result = temp
-			dist = d
-	return result
+		for i in levels:
+			var temp = Vector3(end.x, 0, end.z) + dir + i
+			if is_occupied(temp): continue
+			if not temp in walkable_cells: continue # Safety check
+			
+			var d = start.distance_to(temp)
+			if d < dist and temp.y == start.y:
+				lowest_result = temp
+				dist = d
+			elif d < dist:
+				shortest_result = temp
+				dist = d
+	if lowest_result == start:
+		return shortest_result
+	
+	#print(lowest_result)
+	return lowest_result
 
 func is_occupied(cell: Vector3) -> bool:
 	return is_occupied_by_unit(cell)

@@ -2,13 +2,14 @@ extends Resource
 class_name Grid
 
 # 1. Change size to Vector3! (Width, Height, Depth)
-@export var size := Vector3(20, 20, 20) 
+@export var size := Vector3(20, 10, 20) 
 var cell_size := Vector3(2, 2, 2) : set = on_cell_size
 const TERRAIN_RULES = {
-	-1: {"cost": 1, "passable": true,  "is_stair": false}, # Normal
-	2:  {"cost": 1, "passable": false, "is_stair": false}, # Impassable
-	1:  {"cost": 2, "passable": true,  "is_stair": false}, # Difficult (-1 Move)
-	0:  {"cost": 1, "passable": true,  "is_stair": true }  # Stairs
+	-1: {"cost": 1, "passable": true,  "is_stair": false, "is_entrance": false},
+	2:  {"cost": 1, "passable": false, "is_stair": false, "is_entrance": false}, # Impassable
+	1:  {"cost": 2, "passable": true,  "is_stair": false, "is_entrance": false}, # Difficult
+	0:  {"cost": 1, "passable": true,  "is_stair": true,  "is_entrance": false}, # Stair
+	3:  {"cost": 1, "passable": true,  "is_stair": false, "is_entrance": true }  # Stair Entrance
 }
 
 # Helper to safely get terrain data for any cell

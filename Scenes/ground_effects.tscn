@@ -25,6 +25,13 @@ albedo_texture = ExtResource("3_ievae")
 [sub_resource type="PlaneMesh" id="PlaneMesh_ul425"]
 material = SubResource("StandardMaterial3D_fs83u")
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_4q3j7"]
+albedo_color = Color(0, 1, 1, 1)
+albedo_texture = ExtResource("1_4q3j7")
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_cys1v"]
+material = SubResource("StandardMaterial3D_4q3j7")
+
 [node name="Tiles" type="Node3D" unique_id=982418080]
 
 [node name="Stairs" type="MeshInstance3D" parent="." unique_id=109821182]
@@ -59,3 +66,14 @@ mesh = SubResource("PlaneMesh_ul425")
 shape = SubResource("ConvexPolygonShape3D_mkgt0")
 
 [node name="Center" type="Node3D" parent="Impassable" unique_id=75935802]
+
+[node name="StairsEntrance" type="MeshInstance3D" parent="." unique_id=1004020447]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 5.627778, -1, 9.51838)
+mesh = SubResource("PlaneMesh_cys1v")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="StairsEntrance" unique_id=888518694]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StairsEntrance/StaticBody3D" unique_id=624672967]
+shape = SubResource("ConvexPolygonShape3D_mkgt0")
+
+[node name="Center" type="Node3D" parent="StairsEntrance" unique_id=69729863]

@@ -33,25 +33,27 @@ func _add_and_connect_points(cell_mappings: Dictionary) -> void:
 		for neighbour_index in find_neighbouring_indices(point,cell_mappings):
 			_astar.connect_points(cell_mappings[point], neighbour_index)
 	
+# Scripts/path_finder.gd
+
 func find_neighbouring_indices(cell: Vector3, cell_mappings: Dictionary) -> Array:
 	var out := []
+	# Ensure this script has access to your main script's terrain cache
 
 	for direction in DIRECTIONS:
 		for y_offset in [0, 1, -1]:
 			var neighbour = cell + direction + Vector3(0, y_offset, 0)
 			if not cell_mappings.has(neighbour): continue
 			
-			var next_rules = _terrain_cache.get(neighbour, {"is_stair": false, "cost": 1})
+			var curr_rules = _terrain_cache.get(cell, _grid.get_rules(-1))
+			var next_rules = _terrain_cache.get(neighbour, _grid.get_rules(-1))
 			
-			# Abstract Vertical Check
-			if neighbour.y != cell.y:
-				var curr_rules = _terrain_cache.get(cell, {"is_stair": false})
-				if not next_rules.is_stair and not curr_rules.is_stair:
-					continue
+			# Use the same strict rule as Main.gd
+			if neighbour.y != cell.y or curr_rules.is_stair or next_rules.is_stair:
+				var valid = (curr_rules.is_stair and (next_rules.is_stair or next_rules.is_entrance)) or \
+							(next_rules.is_stair and (curr_rules.is_stair or curr_rules.is_entrance))
+				if not valid: continue
 			
 			if not _astar.are_points_connected(cell_mappings[cell], cell_mappings[neighbour]):
-				# BAKE COST INTO ASTAR WEIGHT: 
-				# This ensures pathfinding actually picks the shortest AP path, not just shortest tile path
 				_astar.set_point_weight_scale(cell_mappings[neighbour], next_rules.cost)
 				out.push_back(cell_mappings[neighbour])
 			break 

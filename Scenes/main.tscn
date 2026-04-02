@@ -44,10 +44,12 @@ metadata/_editor_floor_ = Vector3(0, 0, 0)
 
 [node name="Terrain" type="GridMap" parent="." unique_id=136083184]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+visible = false
 mesh_library = ExtResource("4_1w6v2")
 data = {
-"cells": PackedInt32Array(4, 4, 0, 4, 5, 0, 4, 6, 0, 4, 7, 0, 6, 1, 1, 6, 2, 1, 6, 3, 1)
+"cells": PackedInt32Array(4, 4, 0, 4, 5, 0, 4, 6, 0, 4, 7, 0, 6, 1, 1, 6, 2, 1, 6, 3, 1, 5, 4, 3, 5, 5, 3, 5, 6, 3, 5, 7, 3, 65539, 4, 3, 65539, 5, 3, 65539, 6, 3, 65539, 7, 3)
 }
+metadata/_editor_floor_ = Vector3(0, 1, 0)
 
 [node name="SignalBus" parent="." unique_id=1903393373 instance=ExtResource("4_b3802")]
 
@@ -76,8 +78,9 @@ mesh_library = ExtResource("10_wsu2k")
 [node name="Cursor" parent="." unique_id=1127224615 instance=ExtResource("12_bvaut")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.744, 0, -6.326)
 
-[node name="Character" parent="." unique_id=120968370 node_paths=PackedStringArray("attack_abilities", "special_abilities") instance=ExtResource("2_r85wr")]
+[node name="Character" parent="." unique_id=120968370 node_paths=PackedStringArray("ground", "attack_abilities", "special_abilities") instance=ExtResource("2_r85wr")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.48616, 2.41666, 0)
+ground = NodePath("../Ground")
 offset = Vector3(0, 0, 0)
 initial_cell = Vector3(5, 0, 3)
 option_menu_offset = Vector2(100, -100)
@@ -102,8 +105,9 @@ status = "Forgiveness"
 ability_name = "Forgiveness"
 status_infliction = ExtResource("18_cbgmd")
 
-[node name="Character2" parent="." unique_id=276793439 node_paths=PackedStringArray("attack_abilities", "special_abilities") instance=ExtResource("2_r85wr")]
+[node name="Character2" parent="." unique_id=276793439 node_paths=PackedStringArray("ground", "attack_abilities", "special_abilities") instance=ExtResource("2_r85wr")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.124868, 2.267197, 4.0011683)
+ground = NodePath("../Ground")
 offset = Vector3(0, 0, 0)
 initial_cell = Vector3(3, 0, 0)
 cname = "P2"
@@ -157,7 +161,8 @@ signal_bus = NodePath("../../SignalBus")
 [node name="BattleStateMachine" parent="." unique_id=483840876 node_paths=PackedStringArray("signal_bus") instance=ExtResource("19_fevyy")]
 signal_bus = NodePath("../SignalBus")
 
-[node name="AI" parent="." unique_id=27490163 node_paths=PackedStringArray("attack_abilities") instance=ExtResource("26_cbgmd")]
+[node name="AI" parent="." unique_id=27490163 node_paths=PackedStringArray("ground", "attack_abilities") instance=ExtResource("26_cbgmd")]
+ground = NodePath("../Ground")
 offset = Vector3(0, 0, 0)
 initial_cell = Vector3(1, 0, 1)
 cname = "AI1"

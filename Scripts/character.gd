@@ -5,6 +5,7 @@ const DIRECTIONS = [Vector3.LEFT, Vector3.RIGHT, Vector3.FORWARD, Vector3.BACK]
 
 #==SETTINGS==
 @export var grid: Resource = preload("res://Resources/Grid.tres")
+@export var ground: GridMap
 @export var offset := Vector3(0,2,0)
 @export var initial_cell := Vector3(0,0,0)
 @export var cname := "P1"
@@ -99,6 +100,7 @@ func _ready() -> void:
 	for i in attack_abilities:
 		i.set_ability_owner(self)
 		i.set_range(atk_range,  1)
+		i.set_walkable(ground.get_walkable_cells())
 	for i in special_abilities:
 		i.set_ability_owner(self)
 	cell = initial_cell

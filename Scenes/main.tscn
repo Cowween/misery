@@ -27,6 +27,7 @@
 [ext_resource type="PackedScene" uid="uid://bao4oc6m47qie" path="res://Scenes/Statuses/avarice_effect.tscn" id="18_u50mg"]
 [ext_resource type="PackedScene" uid="uid://dl84svupqw8qx" path="res://Scenes/StateMachine/battle_state_machine.tscn" id="19_fevyy"]
 [ext_resource type="PackedScene" uid="uid://bq68f7evoqgn7" path="res://Scenes/AI/ai_character.tscn" id="26_cbgmd"]
+[ext_resource type="PackedScene" uid="uid://f4e2768ah8cy" path="res://Scenes/AI/oversized_ai_test.tscn" id="28_ueoa1"]
 
 [node name="Main" type="Node" unique_id=197013863 node_paths=PackedStringArray("state_machine")]
 script = ExtResource("1_w5nr3")
@@ -88,6 +89,7 @@ attack_abilities = [NodePath("HeavyAttack"), NodePath("Slash"), NodePath("Resent
 special_abilities = [NodePath("SwordWave")]
 
 [node name="HeavyAttack" parent="Character" unique_id=218684482 instance=ExtResource("12_fevyy")]
+ap_cost = 2
 
 [node name="Slash" parent="Character" unique_id=1686365112 instance=ExtResource("13_hibaj")]
 
@@ -166,9 +168,23 @@ ground = NodePath("../Ground")
 offset = Vector3(0, 0, 0)
 initial_cell = Vector3(1, 0, 1)
 cname = "AI1"
-attack_abilities = [NodePath("Slash")]
+attack_abilities = [NodePath("Slash"), NodePath("HeavyAttack")]
 
 [node name="Slash" parent="AI" unique_id=1643767841 instance=ExtResource("13_hibaj")]
+
+[node name="HeavyAttack" parent="AI" unique_id=1952292855 instance=ExtResource("12_fevyy")]
+ap_cost = 2
+
+[node name="AI2" parent="." unique_id=18568727 node_paths=PackedStringArray("ground", "attack_abilities") instance=ExtResource("28_ueoa1")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17, 2, 22)
+ground = NodePath("../Ground")
+offset = Vector3(0, 0, 0)
+initial_cell = Vector3(11, 0, 6)
+cname = "Big Monster"
+attack_abilities = [NodePath("HeavyAttack")]
+
+[node name="HeavyAttack" parent="AI2" unique_id=1649147124 instance=ExtResource("12_fevyy")]
+atk_multiplier = 4
 
 [connection signal="action_done" from="SignalBus" to="." method="_on_signal_bus_action_done"]
 [connection signal="adr_update" from="SignalBus" to="UI elements/BattleUI" method="_on_signal_bus_adr_update"]

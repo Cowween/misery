@@ -14,6 +14,7 @@ const status_icon := preload("uid://bphm2w3qsdq7a")
 @onready var adrenaline_bar := $PlayerInfo/ADR
 @onready var player_statuses := $PlayerStatuses
 @onready var enemy_statuses := $EnemyStatuses
+@onready var initiative := $Initiative/VBoxContainer
 
 
 @export var signal_bus: SignalBus
@@ -88,7 +89,14 @@ func update_status_bar(target: Character, is_player: bool) -> void:
 		new_status.initialise(i.texture, is_player, i.status_name, i.stacks, i._duration)
 		
 		
-
+func update_initiative(ini : Array) -> void:
+	for i in initiative.get_children():
+		i.queue_free()
+	for i in range(ini.size()-1, -1, -1):
+		var l := Label.new()
+		l.text = ini[i].cname
+		initiative.add_child(l)
+		
 
 func _on_signal_bus_status_update(target: Character, is_player: bool) -> void:
 	update_status_bar(target, is_player)

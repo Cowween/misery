@@ -1,9 +1,26 @@
-[gd_scene load_steps=2 format=3 uid="uid://ce82pnvqf3agw"]
+[gd_scene format=3 uid="uid://ce82pnvqf3agw"]
 
 [ext_resource type="Script" uid="uid://b8jcegom7wbh4" path="res://Scripts/ability_option.gd" id="1_qmico"]
 
-[node name="AbilityOption" type="Button"]
+[sub_resource type="LabelSettings" id="LabelSettings_qmico"]
+font_size = 12
+
+[node name="AbilityOption" type="Button" unique_id=1589863952]
+offset_right = 128.0
+offset_bottom = 31.0
 text = "Button 1"
 script = ExtResource("1_qmico")
+
+[node name="APCost" type="Label" parent="." unique_id=1118591175]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -16.0
+offset_bottom = 23.0
+grow_horizontal = 0
+text = "1"
+label_settings = SubResource("LabelSettings_qmico")
+horizontal_alignment = 1
 
 [connection signal="pressed" from="." to="." method="_on_pressed"]

@@ -1,61 +1,63 @@
 extends BattleState
 
-# 'msg' allows passing data between states (e.g. "attack_target": enemy)
-"""
-1. Select a target to approach
-2. Approach target
-3. If target in range, attack
-4. Attack using a specific chain to combo status effects
-"""
-
-var current : AI_Character
-var target : Character
+var current: Character
+var target_tile: Vector3
 
 func enter(_msg: Dictionary = {}) -> void:
-	if not signal_bus.is_connected("walk_finished", _on_walk_finished):
-		signal_bus.walk_finished.connect(_on_walk_finished)
-	
-	#Movement
 	current = main.current
-	target = current.current_targeting.acquire_target("Player", main.occupied_tiles)
-	print("Target is: ", target.cname)
-	var target_pos := main.get_nearest_surrounding_tile(current.cell, target.cell)
-	move_to_target(target_pos)
+	# We fire off the async turn sequence immediately
+	print("AI State for ", current.cname)
+	_execute_ai_turn()
 
 func exit() -> void:
-	if signal_bus.is_connected("walk_finished", _on_walk_finished):
-		signal_bus.walk_finished.disconnect(_on_walk_finished)
+	pass # No more signal disconnecting needed!
 
-func handle_input(_event: InputEvent) -> void:
-	pass
-
-func update(_delta: float) -> void:
-	pass
-	
-func move_to_target(target_pos : Vector3) -> void:
+func _execute_ai_turn() -> void:
+	# GAME FEEL: Brief pause so the camera settles and player recognizes it's the enemy's turn
+	await get_tree().create_timer(0.4).timeout
 	main.select_unit_for_movement(current.cell, false)
-	#var edges := main.find_edge_tiles(main.current_range)
-	var shortest_dist := 999999999
-	var actual_end := target_pos
-	for i in main.current_range:
-		var curr_dist := target_pos.distance_to(i)
-		if target_pos.distance_to(i) <= shortest_dist:
-			#print("Dist to ", i, " is ", target_pos.distance_to(i))
-			actual_end = i
-			shortest_dist = curr_dist
-	#print(actual_end)
+	# ==========================================
+	# STEP 1 & 2: DECIDE AND EXECUTE MOVEMENT
+	# ==========================================
+	var move_grid = main.get_movement_grid(current)
+	target_tile = current.current_targeting.get_best_move("Player", move_grid, main.cell_occupants)
 	
-	
-	main.get_node("ArrowMap").get_path_only(current.cell, actual_end, current.action_points)
-	if main.get_node("ArrowMap").current_path.size() > 1:
-		current.walk_along(main.get_node("ArrowMap").current_path)
-	else:
-		_on_walk_finished()
-	
-func _on_walk_finished() -> void:
-	print("AI Walk FInished")
-	current.ai_attack(target) #need to reference from special targeting mode
-	
-	current.action_points = 0
-	state_machine.change_state("SelectionState")
+	if target_tile != current.cell:
+		var arrow_map = main.get_node("ArrowMap")
+		arrow_map.get_path_only(current.cell, target_tile, current.action_points)
+		var path = arrow_map.current_path
 		
+		if path.size() > 1:
+			current.walk_along(path)
+			# INLINE WAIT: The script pauses here until the physical movement finishes
+			await signal_bus.walk_finished
+	
+	# GAME FEEL: Brief pause after moving before striking
+	await get_tree().create_timer(0.3).timeout
+	
+	# ==========================================
+	# STEP 3 & 4: DECIDE AND EXECUTE ATTACK
+	# ==========================================
+	var attack_plan = current.current_targeting.get_best_attack_target(
+	current.cell, 
+	current.action_points, 
+	"Player", 
+	main.cell_occupants 
+	)
+	
+	# Check if the array is valid and contains a target
+	if attack_plan.size() >= 2 and attack_plan[0] != null:
+		var target_char = attack_plan[0]
+		var ability = attack_plan[1]
+		
+		current.attack(target_char, ability)
+		
+		# Optional: If your attack animations take time, you can add another await here!
+		# await signal_bus.attack_finished 
+		
+	# ==========================================
+	# STEP 5: END TURN
+	# ==========================================
+	#await get_tree().create_timer(0.5).timeout
+	if current.action_points > 0:
+		current.action_points = 0

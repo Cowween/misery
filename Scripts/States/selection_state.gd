@@ -3,7 +3,7 @@ extends BattleState
 
 func enter(_msg: Dictionary = {}) -> void:
 	# Clear any previous overlays/selections
-	print("Selection state")
+	print("Selection state for", main.current.cname)
 	main.deselect_unit_for_movement() 
 	main.attack_mode(false)
 	if not main.current.is_in_group("Player"):
@@ -24,9 +24,9 @@ func handle_input(event: InputEvent) -> void:
 			state_machine.change_state("MoveSelectionState")
 			return
 		
-		if cursor_pos in main.occupied_tiles.values():
+		if cursor_pos in main.cell_occupants.keys():
 			main.focus_target = true
-			var target : Character = main.occupied_tiles.find_key(cursor_pos)
+			var target : Character = main.get_character_at(cursor_pos)
 			main.battle_ui.display_enemy_info(target)
 			
 	if event.is_action_pressed("right_click"):

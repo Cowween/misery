@@ -4,6 +4,9 @@
 [ext_resource type="PackedScene" uid="uid://d1xo0ioc7017e" path="res://Scenes/UI/special_button.tscn" id="2_w7saw"]
 [ext_resource type="PackedScene" uid="uid://bphm2w3qsdq7a" path="res://Scenes/status.tscn" id="3_xs5rh"]
 
+[sub_resource type="LabelSettings" id="LabelSettings_xs5rh"]
+font_size = 30
+
 [node name="BattleUI" type="Control" unique_id=1347659441]
 layout_mode = 3
 anchors_preset = 15
@@ -111,11 +114,16 @@ size_flags_horizontal = 3
 
 [node name="PlayerStatuses" type="HBoxContainer" parent="." unique_id=185924381]
 layout_direction = 2
-layout_mode = 0
-offset_left = 329.0
-offset_top = 560.0
-offset_right = 1132.0
-offset_bottom = 600.0
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 335.0
+offset_top = -91.0
+offset_right = 1138.0
+offset_bottom = -51.0
+grow_vertical = 0
+metadata/_edit_group_ = true
 
 [node name="Status" parent="PlayerStatuses" unique_id=229806799 instance=ExtResource("3_xs5rh")]
 layout_mode = 2
@@ -151,11 +159,51 @@ layout_direction = 3
 layout_mode = 2
 
 [node name="DebugCursorPos" type="Label" parent="." unique_id=2045546484]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -270.0
+offset_top = -106.0
+offset_right = -31.0
+offset_bottom = -49.0
+grow_horizontal = 0
+grow_vertical = 0
+
+[node name="Initiative" type="ScrollContainer" parent="." unique_id=1993066630]
 layout_mode = 0
-offset_left = 901.0
-offset_top = 597.0
-offset_right = 1140.0
-offset_bottom = 635.0
+offset_right = 273.0
+offset_bottom = 369.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Initiative" unique_id=461572074]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Initiative/VBoxContainer" unique_id=1037062160]
+layout_mode = 2
+text = "P1"
+label_settings = SubResource("LabelSettings_xs5rh")
+
+[node name="Label2" type="Label" parent="Initiative/VBoxContainer" unique_id=2004907376]
+layout_mode = 2
+text = "P1"
+label_settings = SubResource("LabelSettings_xs5rh")
+
+[node name="Label3" type="Label" parent="Initiative/VBoxContainer" unique_id=1950042788]
+layout_mode = 2
+text = "P1"
+label_settings = SubResource("LabelSettings_xs5rh")
+
+[node name="Label4" type="Label" parent="Initiative/VBoxContainer" unique_id=2144427826]
+layout_mode = 2
+text = "P1"
+label_settings = SubResource("LabelSettings_xs5rh")
+
+[node name="Label5" type="Label" parent="Initiative/VBoxContainer" unique_id=1495402616]
+layout_mode = 2
+text = "P1"
+label_settings = SubResource("LabelSettings_xs5rh")
 
 [connection signal="pressed" from="PlayerInfo/FunctionalButtons/Attack" to="." method="_on_attack_pressed"]
 [connection signal="pressed" from="PlayerInfo/FunctionalButtons/Turn" to="." method="_on_turn_pressed"]

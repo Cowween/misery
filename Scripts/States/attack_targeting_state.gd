@@ -27,7 +27,7 @@ func handle_input(event: InputEvent) -> void:
 		var cursor_pos = main.cursor_pos
 		
 		# Click Enemy -> Open Menu
-		if cursor_pos in main.attack_zone and main.is_occupied_by_unit(cursor_pos):
+		if cursor_pos in main.attack_zone and main.is_occupied(cursor_pos):
 			main.target_mode(cursor_pos)
 		else:
 			# Click Empty -> Cancel back to Selection

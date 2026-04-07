@@ -19,7 +19,8 @@ const DIRECTIONS = [Vector3.LEFT, Vector3.RIGHT, Vector3.FORWARD, Vector3.BACK]
 var walkable_cells : Array[Vector3] = []
 var levels : Array[Vector3]
 var cached_terrain_data := {}    # Stores Vector3: rules_dict
-var occupied_tiles := {} #In the format of Character: Cell
+#var occupied_tiles := {} #In the format of Character: Cell
+var cell_occupants := {} # Maps Vector3 -> Character
 # Initiative variables
 var queue := []
 var queue_in_action := []
@@ -41,20 +42,23 @@ func _ready() -> void:
 	
 	$ArrowMap.cached_terrain = cached_terrain_data
 	
-	print(cached_terrain_data.get(Vector3(4,0,5)))
+	#print(cached_terrain_data.get(Vector3(4,0,5)))
 	
 	# Initiative Setup
 	walkable_cells = ground.get_walkable_cells()
 	queue = get_tree().get_nodes_in_group("Characters")
 	queue.sort_custom(sort_queue)
 	for i in queue:
+		i.terrain_cache = cached_terrain_data
 		i.signal_bus = $SignalBus
-		occupied_tiles[i] = grid.calculate_grid_coordinates(i.global_position)
+		
+	
 	
 	queue_in_action = queue.duplicate()
 	current = queue_in_action.pop_front()
+	queue_in_action.append(current)
+	battle_ui.update_initiative(queue_in_action)
 	$Arrow.target = current._path_follow
-	occupied_tiles[current] = null
 	current.turn_start()
 	
 	# UI Updates
@@ -69,6 +73,8 @@ func _ready() -> void:
 	# Battle State
 	state_machine.initialise()
 	state_machine.signal_bus = $SignalBus
+	refresh_occupancy()
+	#print("cell occcu list", cell_occupants)
 
 
 # == MAIN LOOP ==
@@ -94,8 +100,8 @@ func _process(_delta: float) -> void:
 	debug_cursor.text = str($Cursor.position) + ", " + str(cursor_pos)
 	# 2. Hover Info (Always Active)
 	if not focus_target:
-		if cursor_pos in occupied_tiles.values():
-			var target : Character = occupied_tiles.find_key(cursor_pos)
+		if cursor_pos in cell_occupants.keys():
+			var target : Character = get_character_at(cursor_pos)
 			battle_ui.display_enemy_info(target)
 		else:
 			battle_ui.hide_enemy_info()
@@ -139,7 +145,7 @@ func select_unit_for_movement(cell: Vector3, draw_overlay:=true) -> void:
 	if cell != current.cell: return
 	
 	# A. Get Movement Grid (Blue Tiles)
-	var move_grid_data := get_movement_grid(current.cell, current.action_points)
+	var move_grid_data := get_movement_grid(current)
 	var valid_move_tiles := move_grid_data.keys()
 	
 	# B. Find Edges for Attack Expansion
@@ -173,7 +179,7 @@ func select_unit_for_movement(cell: Vector3, draw_overlay:=true) -> void:
 
 	# E. Initialize Pathfinding
 	var points : Array[Vector3] = []
-	print(valid_move_tiles)
+	#print(valid_move_tiles)
 	for t in valid_move_tiles:
 		if not is_occupied(t):
 			points.append(t)
@@ -214,11 +220,11 @@ func attack_mode(enable: bool) -> void:
 
 # Called by AttackTargetingState
 func target_mode(target_coordinates: Vector3) -> void:
-	if not (target_coordinates in attack_zone and target_coordinates in occupied_tiles.values()):
+	if not (target_coordinates in attack_zone and target_coordinates in cell_occupants.keys()):
 		return
 		
-	var target = occupied_tiles.find_key(target_coordinates)
-	if target.is_in_group("Characters"):
+	var target = get_character_at(target_coordinates)
+	if target and target.is_in_group("Characters"):
 		current_target = target
 		attack_interface.display_attacks(target, current)
 
@@ -245,10 +251,10 @@ func _cache_terrain() -> void:
 
 # NEW: Calculates ONLY movement (Blue Tiles)
 # Replaces the first half of _flood_fill
-func get_movement_grid(start_cell: Vector3, ap: int) -> Dictionary:
+func get_movement_grid(moving_unit: Character) -> Dictionary:
 	var move_grid := {} 
-	var queue := [start_cell]
-	move_grid[start_cell] = ap 
+	var queue := [moving_unit.cell]
+	move_grid[moving_unit.cell] = moving_unit.action_points
 	
 	while not queue.is_empty():
 		var curr = queue.pop_front()
@@ -256,36 +262,42 @@ func get_movement_grid(start_cell: Vector3, ap: int) -> Dictionary:
 		if current_ap <= 0: continue
 
 		for direction in DIRECTIONS:
-			for y_offset in [0, 1, -1]: # Check flat, then up, then down
+			for y_offset in [0, 1, -1]:
 				var next = curr + direction + Vector3(0, y_offset, 0)
 				
-				if not grid.is_within_bounds(next): continue
-				if not walkable_cells.has(next): continue
+				# --- 1. OVERSIZED FOOTPRINT CHECK ---
+				var fits_in_space = true
+				for x_offset in range(moving_unit.side_length):
+					for z_offset in range(moving_unit.side_length):
+						var test_cell = next + Vector3(x_offset, 0, z_offset)
+						
+						if not grid.is_within_bounds(test_cell): fits_in_space = false; break
+						if not walkable_cells.has(test_cell): fits_in_space = false; break
+						if is_occupied(test_cell, moving_unit): fits_in_space = false; break
+					
+					if not fits_in_space: break
+				
+				if not fits_in_space: continue 
 				
 				var next_rules = cached_terrain_data.get(next, grid.get_rules(-1))
-				if not next_rules.passable or is_occupied(next): continue
+				if not next_rules.passable: continue
 				
-				# --- UNIFIED STAIR & HEIGHT CHECK ---
-				var curr_rules = cached_terrain_data.get(curr, grid.get_rules(-1))
-				
-				# If we are changing height OR interacting with a stair block
-				if next.y != curr.y or curr_rules.is_stair or next_rules.is_stair:
-					# Valid move only if:
-					# 1. Stair to Stair
-					# 2. Stair to Entrance
-					# 3. Entrance to Stair
-					var valid = (curr_rules.is_stair and (next_rules.is_stair or next_rules.is_entrance)) or \
-								(next_rules.is_stair and (curr_rules.is_stair or curr_rules.is_entrance))
-					
-					if not valid: continue 
-				# ------------------------------------
-
+				# --- 2. STAIR / HEIGHT CHECK ---
+				if next.y != curr.y:
+					var curr_rules = cached_terrain_data.get(curr, grid.get_rules(-1))
+					var valid_climb = (curr_rules.is_stair and next_rules.is_entrance) or \
+									  (curr_rules.is_entrance and next_rules.is_stair)
+					if not valid_climb:
+						continue 
+						
+				# --- 3. APPLY COST ---
 				var next_ap = current_ap - next_rules.cost
 				if next_ap >= 0 and (not move_grid.has(next) or next_ap > move_grid[next]):
 					move_grid[next] = next_ap
 					queue.append(next)
 					
 				if walkable_cells.has(next): break
+				
 	return move_grid
 
 # Helper to dynamically find the Range Node on the character's active ability
@@ -330,12 +342,28 @@ func get_nearest_surrounding_tile(start: Vector3, end: Vector3) -> Vector3:
 	
 	#print(lowest_result)
 	return lowest_result
+func refresh_occupancy() -> void:
+	cell_occupants.clear()
+	var all_units = get_tree().get_nodes_in_group("Characters")
+	#print("all units", all_units)
+	for unit in all_units:
+		if unit:
+			# Update the root cell based on their physical 3D location
+			unit.cell = grid.calculate_grid_coordinates(unit.global_position)
+			print(unit.cell)
+			# Map every single tile in their footprint to this unit
+			for footprint_tile in unit.get_occupied_cells():
+				cell_occupants[footprint_tile] = unit
+				
+func get_character_at(check_cell: Vector3) -> Character:
+	return cell_occupants.get(check_cell, null)
 
-func is_occupied(cell: Vector3) -> bool:
-	return is_occupied_by_unit(cell)
+func is_occupied(check_cell: Vector3, ignore_unit: Character = current) -> bool:
+	var occupant = get_character_at(check_cell)
+	if occupant and occupant != ignore_unit:
+		return true
+	return false
 	
-func is_occupied_by_unit(cell: Vector3) -> bool:
-	return cell in occupied_tiles.values()
 
 func sort_queue(a, b):
 	return a.initiative > b.initiative
@@ -355,13 +383,14 @@ func _on_signal_bus_action_done() -> void:
 	if queue_in_action.size() == 0:
 		queue_in_action = queue.duplicate()
 
-	occupied_tiles[current] = grid.calculate_grid_coordinates(current.global_position)
+	refresh_occupancy()
 	current.turn_end()
 	
 	# Switch Turn
 	current = queue_in_action.pop_front()
+	queue_in_action.append(current)
+	battle_ui.update_initiative(queue_in_action)
 	current.initialise()
-	occupied_tiles[current] = null
 	$Arrow.target = current._path_follow
 	current.turn_start()
 	
@@ -376,6 +405,7 @@ func _on_signal_bus_action_done() -> void:
 
 
 func _on_signal_bus_unit_death(unit: Character) -> void:
-	occupied_tiles.erase(unit)
+	for i in unit.get_occupied_cells():
+		cell_occupants.erase(i)
 	queue.erase(unit)
 	queue_in_action.erase(unit)

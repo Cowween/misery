@@ -4,12 +4,13 @@ extends Path3D
 const DIRECTIONS = [Vector3.LEFT, Vector3.RIGHT, Vector3.FORWARD, Vector3.BACK]
 
 #==SETTINGS==
-@export var grid: Resource = preload("res://Resources/Grid.tres")
+@export var grid: Resource = preload("uid://d2qkoqg3ttlpu")
 @export var ground: GridMap
-@export var offset := Vector3(0,2,0)
+@export var offset := Vector3(0,0,0)
 @export var initial_cell := Vector3(0,0,0)
 @export var cname := "P1"
 @export var option_menu_offset := Vector2(10,10)
+@export var side_length: int = 1
 
 #==STATS==
 @export var agility := 100.0
@@ -42,6 +43,7 @@ var status_effects : Array[StatusEffect]
 var atk_mult := 1.0
 var atk_add := 0.0
 var is_current := false
+var terrain_cache := {}
 @onready var _path_follow = $PathFollow3D
 		
 func set_cell(value: Vector3) -> void:
@@ -135,6 +137,14 @@ func _process(delta: float) -> void:
 		curve.clear_points()
 		# Finally, we emit a signal. We'll use this one with the game board.
 		signal_bus.walk_finished.emit()
+
+func get_occupied_cells() -> Array[Vector3]:
+	var cells: Array[Vector3] = []
+	for x_offset in range(side_length):
+		for z_offset in range(side_length):
+			# Height (Y) remains flat relative to the root cell
+			cells.append(cell + Vector3(x_offset, 0, z_offset))
+	return cells
 
 func walk_along(path: PackedVector3Array) -> void:
 	if path.is_empty():

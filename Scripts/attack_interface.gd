@@ -21,7 +21,10 @@ func _process(delta: float) -> void:
 func display_attacks(target: Character, current: Character) -> void:
 	target_character = target
 	for i in current.attack_abilities:
-		add_button(id_count, i.ability_name)
+		var is_disabled := false
+		if i.ap_cost > current.action_points:
+			is_disabled = true
+		add_button(id_count, i.ability_name, i.ap_cost, is_disabled)
 		id_count += 1
 	set_process(true)
 	show()
@@ -34,13 +37,18 @@ func hide_attacks() -> void:
 	hide()
 	
 	
-func add_button(id: int, aname: String) -> void:
+func add_button(id: int, aname: String, cost: int, disabled:=false) -> void:
 	#todo: connect button signal to signal bus
 	var btn = ability_btn.instantiate()
 	btn.text = aname
 	btn.abilityID = id
 	btn.signal_bus = signal_bus
+	
 	container.add_child(btn)
+	btn.set_ap(cost)
+	
+	if disabled:
+		btn.disabled = true
 	
 	
 	

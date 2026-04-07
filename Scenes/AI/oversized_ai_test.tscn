@@ -1,0 +1,25 @@
+[gd_scene format=3 uid="uid://f4e2768ah8cy"]
+
+[ext_resource type="Script" uid="uid://bjocxl5rvybct" path="res://Scripts/AI/ai_character.gd" id="1_5lk3a"]
+[ext_resource type="PackedScene" uid="uid://sdkkaw5nea62" path="res://NECROTHREAD THE PULSE OF ROTTING FLESH/NECROTHREAD.fbx" id="2_5lk3a"]
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_a73ml"]
+
+[node name="AI" type="Path3D" unique_id=27490163 groups=["Characters", "Enemy"]]
+script = ExtResource("1_5lk3a")
+side_length = 2
+
+[node name="PathFollow3D" type="PathFollow3D" parent="." unique_id=84053517]
+progress = 395.136
+rotation_mode = 1
+use_model_front = true
+loop = false
+tilt_enabled = false
+
+[node name="CharacterBody3D" type="StaticBody3D" parent="PathFollow3D" unique_id=1247368120]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, -1)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="PathFollow3D/CharacterBody3D" unique_id=2109183117]
+shape = SubResource("CylinderShape3D_a73ml")
+
+[node name="NECROTHREAD" parent="PathFollow3D/CharacterBody3D" unique_id=939335439 instance=ExtResource("2_5lk3a")]

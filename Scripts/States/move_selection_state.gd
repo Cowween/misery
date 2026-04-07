@@ -21,8 +21,8 @@ func handle_input(event: InputEvent) -> void:
 			return
 		# 2. Check for "Attack After Walk" (Clicking a red tile with an enemy)
 		# We access 'attack_zone' from Main
-		if cursor_pos in main.attack_zone and main.is_occupied_by_unit(cursor_pos):
-			var target_unit = main.occupied_tiles.find_key(cursor_pos)
+		if cursor_pos in main.attack_zone and main.is_occupied(cursor_pos):
+			var target_unit = main.get_character_at(cursor_pos)
 			if target_unit.is_in_group("Characters"):
 				# Logic: Find nearest tile, pathfind, then queue attack
 				_initiate_move(cursor_pos, true) 

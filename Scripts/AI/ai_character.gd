@@ -1,6 +1,7 @@
 extends Character
 class_name AI_Character
 @export var target_group := "Player"
+@export var initial_targeting := 0
 var targeting_list : Array[AITargeting] = []
 
 var current_targeting : AITargeting
@@ -15,7 +16,7 @@ func _ready() -> void:
 	targeting_list.append(AggressiveTargeting.new(self, terrain_cache))
 	targeting_list.append(DefensiveTargeting.new(self, terrain_cache))
 	targeting_list.append(PassiveTargeting.new(self, terrain_cache))
-	current_targeting = targeting_list[0]
+	current_targeting = targeting_list[initial_targeting]
 	#print(targeting)
 
 

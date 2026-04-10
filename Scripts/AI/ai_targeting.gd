@@ -29,9 +29,11 @@ func get_best_move(targeted_group: String, move_grid_ap: Dictionary, total_units
 				targets.append(unit)
 				
 	if targets.is_empty(): 
+		
 		return best_tile
 
 	# Evaluate every tile we can reach (including the tile we are standing on)
+	print("here")
 	for tile in move_grid_ap.keys():
 		var remaining_ap = move_grid_ap[tile]
 		var score = 0.0
@@ -41,13 +43,10 @@ func get_best_move(targeted_group: String, move_grid_ap: Dictionary, total_units
 		score += evaluate_terrain(tile, targets) * weight_terrain
 		score += evaluate_safety(tile, targets) * weight_safety
 		
-		# Introduce a tiny random factor (0.01) to break ties organically
-		score += randf() * 0.1 
 
 		if score > best_score:
 			best_score = score
 			best_tile = tile
-
 	return best_tile
 
 func get_best_attack_target(current_tile: Vector3, remaining_ap: int, targeted_group: String, total_units: Dictionary) -> Array:

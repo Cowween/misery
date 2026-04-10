@@ -1,6 +1,9 @@
 extends StatusEffect
 class_name RestraintEffect
-
+"""
+“Restraint” that generates adrenaline for every turn the targeted enemy is untouched
+Avarice + Restraint = ADR gain
+"""
 var ADR_add := 1
 
 func on_apply(target: Character) -> void:
@@ -8,9 +11,6 @@ func on_apply(target: Character) -> void:
 	victim = target
 	victim.adrenaline += ADR_add
 	
-func on_remove() -> void:
-	victim.status_effects.erase(self)
-	queue_free()
 	
 func on_turn_start() -> void:
 	victim.adrenaline += ADR_add

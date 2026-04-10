@@ -1,0 +1,8 @@
+[gd_scene format=3 uid="uid://bxtgi3uai5ndf"]
+
+[ext_resource type="Script" uid="uid://0u3ufdc0f0cx" path="res://Scripts/Statuses/sacrifice_effect.gd" id="1_3iqer"]
+
+[node name="SacrificeEffect" type="Node" unique_id=805991812]
+script = ExtResource("1_3iqer")
+status_name = "Sacrifice"
+texture = Color(1, 0.36862746, 1, 1)

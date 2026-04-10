@@ -14,7 +14,4 @@ func initialise(next_color : Color, is_player : bool, status_name: String, stack
 	duration_text.text = str(duration)
 	tooltip_text = status_name + " " + str(stacks) + " stacks" + " " + str(duration) + " turns left"
 
-func add_stacks() -> void:
-	no_of_stacks += 1
-	stacks_count.text = no_of_stacks
 	

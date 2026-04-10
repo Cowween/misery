@@ -1,0 +1,16 @@
+[gd_scene format=3 uid="uid://nlhh4xt6pti2"]
+
+[ext_resource type="Script" uid="uid://dg4nnjxsrjkul" path="res://Scripts/sacrificial_slash.gd" id="1_0dhcj"]
+[ext_resource type="PackedScene" uid="uid://bigkpqc8286ab" path="res://Scenes/Statuses/sacrificial_lamb.tscn" id="2_ctm66"]
+[ext_resource type="PackedScene" uid="uid://bxtgi3uai5ndf" path="res://Scenes/Statuses/sacrifice_effect.tscn" id="3_62xp8"]
+[ext_resource type="PackedScene" uid="uid://db1knfwyv5ukh" path="res://Scenes/Attacks/Ranges/diamond_range.tscn" id="4_2y0mt"]
+
+[node name="SacrificialSlash" type="Node" unique_id=744187302 node_paths=PackedStringArray("ability_range")]
+script = ExtResource("1_0dhcj")
+victim_status = ExtResource("2_ctm66")
+atk_multiplier = 1.2
+ability_name = "Sacrificial Slash"
+ability_range = NodePath("DiamondRange")
+status_infliction = ExtResource("3_62xp8")
+
+[node name="DiamondRange" parent="." unique_id=1447504178 instance=ExtResource("4_2y0mt")]

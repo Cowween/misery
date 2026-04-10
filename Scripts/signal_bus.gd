@@ -4,7 +4,7 @@ class_name SignalBus
 signal action_done
 signal walk_finished
 signal ap_update(value:int)
-signal hp_update(value:float)
+signal hp_update(value:float, max_hp: float)
 signal atk_pressed(atk_id: int)
 signal special_pressed(toggle: bool, special_id: int)
 signal turn_start

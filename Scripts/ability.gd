@@ -2,7 +2,7 @@
 extends Node
 class_name Ability
 
-@export var atk_multiplier := 1
+@export var atk_multiplier := 1.0
 @export var ap_cost := 1
 @export var ability_name := ""
 @export var ability_range : AbilityRange
@@ -20,14 +20,19 @@ func set_ability_owner(owner: Character) -> void:
 	ability_owner = owner
 	ability_range.actor = owner
 
-func inflict_status(target: Character, status_name: String) -> void:
+func inflict_status(target: Character, status_name: String, secondary: PackedScene = null, stacks:=0) -> void:
 	for i in target.status_effects:
 		if i.status_name == status_name:
 			i.add_stack()
 			return
-
-	var new_status := status_infliction.instantiate()
+	var new_status : Node
+	if not secondary:
+		new_status = status_infliction.instantiate()
+	else:
+		new_status = secondary.instantiate()
 	print("Applying ", new_status.status_name, "to ", target.cname)
+	if stacks != 0:
+		new_status.stacks = stacks
 	new_status.on_apply(target)
 	target.add_child(new_status)
 	target.status_update()

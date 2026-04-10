@@ -32,7 +32,7 @@ var action_points = 5: set = set_action_points
 var signal_bus: SignalBus
 var cell := Vector3.ZERO: set = set_cell
 var tile_over = true
-var initiative = randi_range(0,11)
+@export var initiative = 0
 var current_basis = Vector3()
 var is_walking = false : set = set_is_walking
 var hp = max_hp: set =set_hp
@@ -56,7 +56,7 @@ func set_hp(value: float) -> void:
 	if hp <= 0:
 		die()
 	if is_current:
-		signal_bus.hp_update.emit(value)
+		signal_bus.hp_update.emit(value, max_hp)
 	
 func set_is_walking(value: bool) -> void:
 	is_walking = value
@@ -166,7 +166,10 @@ func walk_along(path: PackedVector3Array) -> void:
 	# The `_is_walking` property triggers the move animation and turns on `_process()`. See
 	# `_set_is_walking()` below.
 	is_walking = true
-		
+
+func get_atk_val() -> int:
+	return (atk + atk_add) * atk_mult
+
 func attack(target: Character, abilityID: int) -> void:
 	#For attack, you pass a character object through the target and deduct its hp
 	if action_points < attack_abilities[abilityID].ap_cost:

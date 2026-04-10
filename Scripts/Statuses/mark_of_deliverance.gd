@@ -1,19 +1,15 @@
 extends StatusEffect
-class_name ForgivenessEffect
+class_name MarkOfDeliverance
 """
 “Forgiveness” that clears all statuses for big damage, applies “forgiven”
 Resentment + Forgiveness = hemorrhage for big damage
 """
-@export var atk := 10.0
-
+var no_of_stacks : int
 # Called when the node enters the scene tree for the first time.
 func on_apply(target: Character) -> void:
 	victim = target
-	
-	var no_of_statuses = victim.status_effects.size()
-	victim.status_effects.clear()
+	stacks = no_of_stacks
 	target.status_effects.append(self)
-	victim.hp -= no_of_statuses * atk
 	
 	
 func on_turn_end() -> void:

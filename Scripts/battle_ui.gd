@@ -39,6 +39,12 @@ func update_p_health(hp:float, max_hp:float):
 	print((hp/max_hp)*100)
 	player_bar.value = (hp/max_hp) * 100
 	
+func disable_next_turn() -> void:
+	turn_btn.disabled = true
+	
+func enable_next_turn() -> void:
+	turn_btn.disabled = false
+
 func display_enemy_info(target: Character) -> void:
 	enemy_bar.visible = true
 	enemy_name.visible = true
@@ -92,9 +98,9 @@ func update_status_bar(target: Character, is_player: bool) -> void:
 func update_initiative(ini : Array) -> void:
 	for i in initiative.get_children():
 		i.queue_free()
-	for i in range(ini.size()-1, -1, -1):
+	for i in ini:
 		var l := Label.new()
-		l.text = ini[i].cname
+		l.text = i.cname
 		initiative.add_child(l)
 		
 
@@ -104,3 +110,7 @@ func _on_signal_bus_status_update(target: Character, is_player: bool) -> void:
 
 func _on_signal_bus_adr_update(value: float, max_value: float) -> void:
 	update_adrenaline(value, max_value)
+
+
+func _on_signal_bus_hp_update(value: float, max_hp: float) -> void:
+	update_p_health(value, max_hp)

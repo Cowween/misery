@@ -1,0 +1,9 @@
+[gd_scene format=3 uid="uid://bigkpqc8286ab"]
+
+[ext_resource type="Script" uid="uid://c6vmsbxki1x3r" path="res://Scripts/Statuses/sacrificial_lamb.gd" id="1_rcfkj"]
+
+[node name="SacrificialLamb" type="Node" unique_id=665627789]
+script = ExtResource("1_rcfkj")
+base_duration = 5
+status_name = "Sacrificial Lamb"
+texture = Color(0.60827655, 0.07812723, 0.96064633, 1)

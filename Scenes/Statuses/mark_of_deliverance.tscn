@@ -1,0 +1,9 @@
+[gd_scene format=3 uid="uid://dinby1vg5wi2t"]
+
+[ext_resource type="Script" uid="uid://4eni35xtrvva" path="res://Scripts/Statuses/mark_of_deliverance.gd" id="1_q3drw"]
+
+[node name="MarkOfDeliverance" type="Node" unique_id=906485746]
+script = ExtResource("1_q3drw")
+base_duration = 5
+status_name = "Mark Of Deliverance"
+texture = Color(0.60203844, 0.39487162, 0.13486597, 1)

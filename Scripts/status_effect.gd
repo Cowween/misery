@@ -18,15 +18,17 @@ func set_duration(value: int) -> void:
 	if _duration <= 0:
 		on_remove()
 
-func add_stack() -> void:
+func add_stack(amount:=1) -> void:
 	_duration = base_duration
-	stacks += 1
+	stacks += amount
 
 func on_apply(target: Character) -> void:
 	pass
 	
 func on_remove() -> void:
-	pass
+	if victim:
+		victim.status_effects.erase(self)
+	queue_free()
 	
 func on_turn_start() -> void:
 	pass

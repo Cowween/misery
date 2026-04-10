@@ -1,0 +1,10 @@
+[gd_scene format=3 uid="uid://dpruulpybeqko"]
+
+[ext_resource type="Script" uid="uid://ds6ml2hq10dsf" path="res://Scripts/Statuses/deliverance_effect.gd" id="1_88men"]
+
+[node name="DeliveranceEffect" type="Node" unique_id=633778380]
+script = ExtResource("1_88men")
+base_duration = 999
+status_name = "Deliverance"
+stacks = 2
+texture = Color(0.5865644, 0.4903533, 0.206512, 1)

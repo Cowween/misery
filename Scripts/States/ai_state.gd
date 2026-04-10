@@ -7,21 +7,23 @@ func enter(_msg: Dictionary = {}) -> void:
 	current = main.current
 	# We fire off the async turn sequence immediately
 	print("AI State for ", current.cname)
+	main.battle_ui.disable_next_turn()
 	_execute_ai_turn()
 
 func exit() -> void:
+	main.battle_ui.enable_next_turn()
 	pass # No more signal disconnecting needed!
 
 func _execute_ai_turn() -> void:
 	# GAME FEEL: Brief pause so the camera settles and player recognizes it's the enemy's turn
-	await get_tree().create_timer(0.4).timeout
+	#await get_tree().create_timer(0.4).timeout
 	main.select_unit_for_movement(current.cell, false)
 	# ==========================================
 	# STEP 1 & 2: DECIDE AND EXECUTE MOVEMENT
 	# ==========================================
 	var move_grid = main.get_movement_grid(current)
 	target_tile = current.current_targeting.get_best_move("Player", move_grid, main.cell_occupants)
-	
+	print(target_tile)
 	if target_tile != current.cell:
 		var arrow_map = main.get_node("ArrowMap")
 		arrow_map.get_path_only(current.cell, target_tile, current.action_points)
@@ -33,7 +35,7 @@ func _execute_ai_turn() -> void:
 			await signal_bus.walk_finished
 	
 	# GAME FEEL: Brief pause after moving before striking
-	await get_tree().create_timer(0.3).timeout
+	#await get_tree().create_timer(0.3).timeout
 	
 	# ==========================================
 	# STEP 3 & 4: DECIDE AND EXECUTE ATTACK
@@ -44,7 +46,7 @@ func _execute_ai_turn() -> void:
 	"Player", 
 	main.cell_occupants 
 	)
-	
+	print(attack_plan)
 	# Check if the array is valid and contains a target
 	if attack_plan.size() >= 2 and attack_plan[0] != null:
 		var target_char = attack_plan[0]
@@ -52,8 +54,6 @@ func _execute_ai_turn() -> void:
 		
 		current.attack(target_char, ability)
 		
-		# Optional: If your attack animations take time, you can add another await here!
-		# await signal_bus.attack_finished 
 		
 	# ==========================================
 	# STEP 5: END TURN

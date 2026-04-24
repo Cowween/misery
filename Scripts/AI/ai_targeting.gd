@@ -68,10 +68,17 @@ func get_best_attack_target(current_tile: Vector3, remaining_ap: int, targeted_g
 	# Evaluate every ability against every target in range
 	var atkid := 0
 	for ability in actor.attack_abilities:
-		if ability.ap_cost <= remaining_ap:
+		ability.prepare_for_use()
+		if ability.get_ap_cost() <= remaining_ap:
+			var range_cells = ability.ability_range.get_tiles_in_range(current_tile)
 			for target in targets:
+				var target_in_range := false
+				for occupied_cell in target.get_occupied_cells():
+					if range_cells.has(occupied_cell):
+						target_in_range = true
+						break
 				
-				if actor.is_in_atk_range(target, ability):
+				if target_in_range:
 					# Found a valid target in range! Score the attack.
 					var score = evaluate_target_value(target, ability)
 					score += randf() * 0.1 # Tie-breaker
@@ -92,7 +99,7 @@ func evaluate_target_value(target: Character, ability: Ability) -> float:
 	var score = 0.0
 	
 	# Safely estimate damage (Assuming your ability script has a 'damage' or 'base_damage' property)
-	var estimated_damage = ability.atk_multiplier * actor.atk * actor.atk_mult
+	var estimated_damage = ability.get_damage_multiplier() * actor.atk * actor.atk_mult * ability.get_hit_count()
 	
 	# 1. Damage Efficiency: Reward using strong attacks against enemies
 	var health_percentage_taken = float(estimated_damage) / float(target.max_hp)
@@ -111,13 +118,17 @@ func evaluate_attack(tile: Vector3, remaining_ap: int, targets: Array[Character]
 	var score = 0.0
 	# Loop through actor's abilities to see if they can afford to attack from here
 	for ability in actor.attack_abilities:
-		if ability.ap_cost <= remaining_ap:
+		ability.prepare_for_use()
+		if ability.get_ap_cost() <= remaining_ap:
 			# Check if any target is within this ability's range from this tile
 			var range_cells = ability.ability_range.get_tiles_in_range(tile)
 			for target in targets:
-				if range_cells.has(target.cell):
+				for occupied_cell in target.get_occupied_cells():
+					if not range_cells.has(occupied_cell):
+						continue
 					# Found a valid attack! Score increases based on target's missing health (finish them off)
 					score += 1.0 + (1.0 - (target.hp / float(target.max_hp)))
+					break
 	return score
 
 func evaluate_distance(tile: Vector3, targets: Array[Character]) -> float:

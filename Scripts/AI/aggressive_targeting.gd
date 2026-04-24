@@ -15,7 +15,7 @@ func evaluate_target_value(target: Character, ability: Ability) -> float:
 	var score = super.evaluate_target_value(target, ability)
 	
 	# Aggressive AI absolutely LOVES to secure kills. 
-	var estimated_damage = ability.atk_multiplier * actor.atk * actor.atk_mult
+	var estimated_damage = ability.get_damage_multiplier() * actor.atk * actor.atk_mult * ability.get_hit_count()
 	if estimated_damage >= target.hp:
 		score += 500.0 # Extreme priority for lethal blows
 		
@@ -24,6 +24,6 @@ func evaluate_target_value(target: Character, ability: Ability) -> float:
 	score += (100.0 - target.hp)
 	
 	# Bonus if it's a high AP cost ability (goes all-out)
-	score += ability.ap_cost * 10.0
+	score += ability.get_ap_cost() * 10.0
 	
 	return score

@@ -38,4 +38,5 @@ func _on_attack_executed(_atk_id: int) -> void:
 	# Main.gd handles the actual damage logic via its own signal connection
 	# We just need to exit this state
 	main.current.attack(main.current_target, _atk_id)
+	main.battle_ui.update_specials(main.current.special_abilities)
 	state_machine.change_state("SelectionState")

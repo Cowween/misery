@@ -21,7 +21,10 @@ const DIRECTIONS = [Vector3.LEFT, Vector3.RIGHT, Vector3.FORWARD, Vector3.BACK]
 @export var def := 10.0
 @export var crit_rate := 2.0
 @export var initial_adr := 0.0
-@export var max_adr := 150.0
+@export var max_adr := 100.0
+@export var adr_decay_per_turn := 15.0
+@export var tier_1_threshold := 40.0
+@export var tier_2_threshold := 80.0
 
 #==ABILIITIES==
 @export var attack_abilities : Array[Ability] = []
@@ -37,13 +40,14 @@ var current_basis = Vector3()
 var is_walking = false : set = set_is_walking
 var hp = max_hp: set =set_hp
 var walking_ap := 0
-var adrenaline := 0.0
+var adrenaline := 0.0: set = set_adrenaline
 var speed := 5
 var status_effects : Array[StatusEffect]
 var atk_mult := 1.0
 var atk_add := 0.0
 var is_current := false
 var terrain_cache := {}
+var suppress_action_done := false
 @onready var _path_follow = $PathFollow3D
 		
 func set_cell(value: Vector3) -> void:
@@ -66,7 +70,7 @@ func set_action_points(value: int) -> void:
 	action_points = value
 	print(cname, "ap", value)
 	signal_bus.ap_update.emit(value)
-	if action_points == 0:
+	if action_points == 0 and not suppress_action_done:
 		signal_bus.action_done.emit()
 
 func set_adrenaline(value: float) -> void:
@@ -76,13 +80,15 @@ func set_adrenaline(value: float) -> void:
 	if adrenaline <= 0:
 		adrenaline = 0
 	if is_current:
-		signal_bus.adr_update.emit(value, max_adr)
+		signal_bus.adr_update.emit(adrenaline, max_adr)
 	
 func turn_start() -> void:
 	#connected to  main turn start
 	for i in status_effects:
 		i.on_turn_start()
 	is_current = true
+	for ability in attack_abilities:
+		ability.prepare_for_use()
 	status_update()
 
 func turn_end() -> void:
@@ -90,6 +96,7 @@ func turn_end() -> void:
 	is_current = false
 	for i in status_effects:
 		i.on_turn_end()
+	adrenaline -= adr_decay_per_turn
 	
 func status_update() -> void:
 	signal_bus.emit_signal("status_update", self, is_current)
@@ -105,6 +112,7 @@ func _ready() -> void:
 		i.set_walkable(ground.get_walkable_cells())
 	for i in special_abilities:
 		i.set_ability_owner(self)
+	adrenaline = initial_adr
 	cell = initial_cell
 	position = grid.calculate_map_position(cell) + offset
 	_path_follow.progress = 0.0
@@ -128,10 +136,12 @@ func _process(delta: float) -> void:
 		# lines move the unit in a way that's transparent to the player.
 		var cached_rot = _path_follow.rotation
 		_path_follow.progress = 0.0
-		position = grid.calculate_map_position(cell+offset)
+		position = grid.calculate_map_position(cell) + offset
 		_path_follow.rotation = cached_rot
 		_path_follow.position = Vector3(0,0,0)
+		suppress_action_done = true
 		action_points = walking_ap
+		suppress_action_done = false
 
 		#print(_path_follow.progress_ratio)
 		curve.clear_points()
@@ -170,14 +180,36 @@ func walk_along(path: PackedVector3Array) -> void:
 func get_atk_val() -> int:
 	return (atk + atk_add) * atk_mult
 
+func get_adrenaline_tier() -> int:
+	if adrenaline >= tier_2_threshold:
+		return 2
+	if adrenaline >= tier_1_threshold:
+		return 1
+	return 0
+
+func gain_adrenaline(amount: float) -> void:
+	adrenaline += amount
+
+func spend_all_adrenaline() -> void:
+	adrenaline = 0
+
 func attack(target: Character, abilityID: int) -> void:
 	#For attack, you pass a character object through the target and deduct its hp
-	if action_points < attack_abilities[abilityID].ap_cost:
+	if target == null or not is_instance_valid(target):
+		return
+	if abilityID < 0 or abilityID >= attack_abilities.size():
+		return
+	var ability := attack_abilities[abilityID]
+	if ability == null:
+		return
+	ability.prepare_for_use()
+	var cost := ability.get_ap_cost()
+	if action_points < cost:
 		return
 	_path_follow.look_at(target.position, Vector3(0,1,0), true)
-	attack_abilities[abilityID].execute(target)
-	print("AP cost: ", attack_abilities[abilityID].ap_cost)
-	action_points = action_points - attack_abilities[abilityID].ap_cost
+	ability.execute(target)
+	print("AP cost: ", cost)
+	action_points = action_points - cost
 	
 
 func die() -> void:

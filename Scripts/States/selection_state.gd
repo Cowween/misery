@@ -36,5 +36,12 @@ func handle_input(event: InputEvent) -> void:
 		# For now, we stick to your logic: Clicking an enemy here just inspects them (handled by Main._process)
 
 func _on_special_pressed(toggle: bool, ability_id: int) -> void:
+	if not toggle:
+		return
+	if ability_id < 0 or ability_id >= main.current.special_abilities.size():
+		return
+	var special := main.current.special_abilities[ability_id]
+	if not special.can_execute():
+		return
 	state_machine.change_state("SpecialSelectionState", {
-		"special": main.current.special_abilities[ability_id]})
+		"special": special})

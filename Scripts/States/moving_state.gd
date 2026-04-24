@@ -20,6 +20,9 @@ func exit() -> void:
 		signal_bus.walk_finished.disconnect(_on_walk_finished)
 
 func _on_walk_finished() -> void:
+	if main.current.action_points <= 0:
+		signal_bus.action_done.emit()
+		return
 	if attack_after_walk:
 		# Transition to Attack Mode, pre-selecting the target
 		state_machine.change_state("AttackTargetingState", {"auto_target": saved_target_pos})

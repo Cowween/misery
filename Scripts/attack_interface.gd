@@ -19,22 +19,28 @@ func _process(delta: float) -> void:
 	position = camera.unproject_position(target_character.position) + target_character.option_menu_offset
 	
 func display_attacks(target: Character, current: Character) -> void:
+	clear_attack_buttons()
 	target_character = target
 	for i in current.attack_abilities:
+		i.prepare_for_use()
+		var cost := i.get_ap_cost()
 		var is_disabled := false
-		if i.ap_cost > current.action_points:
+		if cost > current.action_points:
 			is_disabled = true
-		add_button(id_count, i.ability_name, i.ap_cost, is_disabled)
+		add_button(id_count, i.get_display_name(), cost, is_disabled)
 		id_count += 1
 	set_process(true)
 	show()
 	
 func hide_attacks() -> void:
+	clear_attack_buttons()
+	set_process(false)
+	hide()
+	
+func clear_attack_buttons() -> void:
 	for i in container.get_children():
 		i.queue_free()
 	id_count = 0
-	set_process(false)
-	hide()
 	
 	
 func add_button(id: int, aname: String, cost: int, disabled:=false) -> void:

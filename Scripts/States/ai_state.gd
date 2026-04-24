@@ -2,19 +2,25 @@ extends BattleState
 
 var current: Character
 var target_tile: Vector3
+var turn_token := 0
 
 func enter(_msg: Dictionary = {}) -> void:
+	turn_token += 1
 	current = main.current
 	# We fire off the async turn sequence immediately
 	print("AI State for ", current.cname)
 	main.battle_ui.disable_next_turn()
-	_execute_ai_turn()
+	_execute_ai_turn(turn_token)
 
 func exit() -> void:
+	turn_token += 1
 	main.battle_ui.enable_next_turn()
 	pass # No more signal disconnecting needed!
 
-func _execute_ai_turn() -> void:
+func _is_turn_active(token: int) -> bool:
+	return token == turn_token and is_instance_valid(current) and current == main.current
+
+func _execute_ai_turn(token: int) -> void:
 	# GAME FEEL: Brief pause so the camera settles and player recognizes it's the enemy's turn
 	#await get_tree().create_timer(0.4).timeout
 	main.select_unit_for_movement(current.cell, false)
@@ -33,6 +39,11 @@ func _execute_ai_turn() -> void:
 			current.walk_along(path)
 			# INLINE WAIT: The script pauses here until the physical movement finishes
 			await signal_bus.walk_finished
+			if not _is_turn_active(token):
+				return
+			if current.action_points <= 0:
+				signal_bus.action_done.emit()
+				return
 	
 	# GAME FEEL: Brief pause after moving before striking
 	#await get_tree().create_timer(0.3).timeout
@@ -40,6 +51,8 @@ func _execute_ai_turn() -> void:
 	# ==========================================
 	# STEP 3 & 4: DECIDE AND EXECUTE ATTACK
 	# ==========================================
+	if not _is_turn_active(token):
+		return
 	var attack_plan = current.current_targeting.get_best_attack_target(
 	current.cell, 
 	current.action_points, 
@@ -59,5 +72,7 @@ func _execute_ai_turn() -> void:
 	# STEP 5: END TURN
 	# ==========================================
 	#await get_tree().create_timer(0.5).timeout
+	if not _is_turn_active(token):
+		return
 	if current.action_points > 0:
 		current.action_points = 0

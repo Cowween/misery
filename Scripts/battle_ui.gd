@@ -63,10 +63,15 @@ func hide_enemy_info() -> void:
 	enemy_statuses.visible = false
 
 func update_specials(specials_list: Array[SpecialAbility]) -> void:
-	for i in specials_list.size():
+	var visible_count = min(specials_list.size(), special_buttons.size())
+	for i in visible_count:
 		special_buttons[i].special_id = i
+		special_buttons[i].text = specials_list[i].ability_name
+		special_buttons[i].disabled = not specials_list[i].can_execute()
+	for i in range(visible_count, special_buttons.size()):
+		special_buttons[i].disabled = true
 
-func update_adrenaline(adrenaline: int, max_adr: int) -> void:
+func update_adrenaline(adrenaline: float, max_adr: float) -> void:
 	adrenaline_bar.value = adrenaline
 	adrenaline_bar.max_value = max_adr
 
@@ -109,6 +114,7 @@ func _on_signal_bus_status_update(target: Character, is_player: bool) -> void:
 
 
 func _on_signal_bus_adr_update(value: float, max_value: float) -> void:
+	
 	update_adrenaline(value, max_value)
 
 

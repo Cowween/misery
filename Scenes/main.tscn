@@ -177,7 +177,7 @@ ground = NodePath("../Ground")
 initial_cell = Vector3(1, 0, 1)
 cname = "AI1"
 attack_abilities = [NodePath("Slash"), NodePath("HeavyAttack")]
-initiative = 3
+initiative = 5
 
 [node name="Slash" parent="AI" unique_id=1643767841 instance=ExtResource("13_hibaj")]
 

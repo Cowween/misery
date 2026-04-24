@@ -19,7 +19,6 @@ const DIRECTIONS = [Vector3.LEFT, Vector3.RIGHT, Vector3.FORWARD, Vector3.BACK]
 var walkable_cells : Array[Vector3] = []
 var levels : Array[Vector3]
 var cached_terrain_data := {}    # Stores Vector3: rules_dict
-#var occupied_tiles := {} #In the format of Character: Cell
 var cell_occupants := {} # Maps Vector3 -> Character
 # Initiative variables
 var queue := []
@@ -63,8 +62,9 @@ func _ready() -> void:
 	
 	# UI Updates
 	battle_ui.update_ap(current.action_points)
-	battle_ui.update_p_health(current.max_hp, current.hp)
+	battle_ui.update_p_health(current.hp, current.max_hp)
 	battle_ui.update_adrenaline(current.adrenaline, current.max_adr)
+	battle_ui.update_specials(current.special_abilities)
 	
 	# Camera Setup
 	$CameraContainer.position = current.position
@@ -304,6 +304,7 @@ func get_movement_grid(moving_unit: Character) -> Dictionary:
 func _get_active_range_node() -> AbilityRange:
 	if current.attack_abilities.size() > 0:
 		var ability = current.attack_abilities[0]
+		ability.prepare_for_use()
 		# Find the child node that is an AbilityRange
 		return ability.ability_range
 	return null
@@ -400,6 +401,7 @@ func _on_signal_bus_action_done() -> void:
 	$CameraContainer.position = current._path_follow.global_position
 	battle_ui.update_p_health(current.hp, current.max_hp)
 	battle_ui.update_adrenaline(current.adrenaline, current.max_adr)
+	battle_ui.update_specials(current.special_abilities)
 	
 	state_machine.change_state("SelectionState")
 

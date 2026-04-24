@@ -17,7 +17,7 @@ loop = false
 tilt_enabled = false
 
 [node name="CharacterBody3D" type="StaticBody3D" parent="PathFollow3D" unique_id=1247368120]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, -1)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1.5)
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="PathFollow3D/CharacterBody3D" unique_id=2109183117]
 shape = SubResource("CylinderShape3D_a73ml")

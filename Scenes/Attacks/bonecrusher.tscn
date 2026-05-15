@@ -1,0 +1,10 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Abilities/bonecrusher.gd" id="1_bone"]
+[ext_resource type="PackedScene" path="res://Scenes/Attacks/Ranges/diamond_range.tscn" id="2_range"]
+
+[node name="Bonecrusher" type="Node" node_paths=PackedStringArray("ability_range")]
+script = ExtResource("1_bone")
+ability_range = NodePath("DiamondRange")
+
+[node name="DiamondRange" parent="." instance=ExtResource("2_range")]

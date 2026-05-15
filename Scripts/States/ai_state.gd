@@ -22,7 +22,7 @@ func _is_turn_active(token: int) -> bool:
 
 func _execute_ai_turn(token: int) -> void:
 	# GAME FEEL: Brief pause so the camera settles and player recognizes it's the enemy's turn
-	#await get_tree().create_timer(0.4).timeout
+	await get_tree().create_timer(0.4).timeout
 	main.select_unit_for_movement(current.cell, false)
 	# ==========================================
 	# STEP 1 & 2: DECIDE AND EXECUTE MOVEMENT
@@ -71,7 +71,7 @@ func _execute_ai_turn(token: int) -> void:
 	# ==========================================
 	# STEP 5: END TURN
 	# ==========================================
-	#await get_tree().create_timer(0.5).timeout
+	await get_tree().create_timer(0.5).timeout
 	if not _is_turn_active(token):
 		return
 	if current.action_points > 0:

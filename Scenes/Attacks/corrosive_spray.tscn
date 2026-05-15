@@ -1,0 +1,10 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Abilities/corrosive_spray.gd" id="1_spray"]
+[ext_resource type="PackedScene" path="res://Scenes/Attacks/Ranges/cone_range.tscn" id="2_range"]
+
+[node name="CorrosiveSpray" type="Node" node_paths=PackedStringArray("ability_range")]
+script = ExtResource("1_spray")
+ability_range = NodePath("ConeRange")
+
+[node name="ConeRange" parent="." instance=ExtResource("2_range")]

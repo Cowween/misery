@@ -6,6 +6,8 @@ class_name SpecialAbility
 @export var ap_cost := 1
 @export var ability_name := ""
 @export var adr_cost := 1
+@export_enum("physical", "metaphorical") var damage_type := "metaphorical"
+@export_enum("", "str", "dex", "int", "arc") var scaling_stat := ""
 @export_group("Momentum Tuning")
 @export var requires_awakened := true
 @export var consume_all_adrenaline := true
@@ -40,9 +42,10 @@ func pay_cost() -> bool:
 func deal_damage(target: Character) -> float:
 	if not target or not is_instance_valid(target):
 		return 0.0
-	var damage := ability_owner.get_atk_val() * atk_multiplier
-	target.hp -= damage
-	return damage
+	var damage := ability_owner.get_scaled_atk_val(scaling_stat) * atk_multiplier
+	if randf_range(0.0, 100.0) < ability_owner.crit_rate:
+		damage *= 1.5
+	return target.take_damage(damage, ability_owner, damage_type)
 
 func execute(targets: Array[Character]) -> void:
 	pass

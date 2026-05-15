@@ -11,20 +11,54 @@ const DIRECTIONS = [Vector3.LEFT, Vector3.RIGHT, Vector3.FORWARD, Vector3.BACK]
 @export var cname := "P1"
 @export var option_menu_offset := Vector2(10,10)
 @export var side_length: int = 1
+@export var character_class: CharacterClass
 
 #==STATS==
-@export var agility := 100.0
-@export var ap_per_turn = 5
-@export var max_hp = 100.0
-@export var atk_range := 2
-@export var atk := 3.0
-@export var def := 10.0
-@export var crit_rate := 2.0
-@export var initial_adr := 0.0
-@export var max_adr := 100.0
-@export var adr_decay_per_turn := 15.0
-@export var tier_1_threshold := 40.0
-@export var tier_2_threshold := 80.0
+var level: int:
+	get:
+		return character_class.level if character_class else 1
+var agility: float:
+	get:
+		return get_speed()
+var ap_per_turn: int:
+	get:
+		return character_class.ap_per_turn if character_class else 5
+var max_hp: float:
+	get:
+		return character_class.max_hp if character_class else 100.0
+var atk_range: int:
+	get:
+		return character_class.atk_range if character_class else 2
+var atk: float:
+	get:
+		return character_class.max_atk if character_class else 3.0
+var def: float:
+	get:
+		return get_def()
+var res: float:
+	get:
+		return get_res()
+var crit_rate: float:
+	get:
+		return character_class.crit_rate if character_class else 2.0
+var initial_adr: float:
+	get:
+		return character_class.initial_adr if character_class else 0.0
+var max_adr: float:
+	get:
+		return character_class.max_adr if character_class else 100.0
+var adr_decay_per_turn: float:
+	get:
+		return character_class.adr_decay_per_turn if character_class else 15.0
+var tier_1_threshold: float:
+	get:
+		return character_class.tier_1_threshold if character_class else 20.0
+var tier_2_threshold: float:
+	get:
+		return character_class.tier_2_threshold if character_class else 50.0
+var tier_3_threshold: float:
+	get:
+		return character_class.tier_3_threshold if character_class else 90.0
 
 #==ABILIITIES==
 @export var attack_abilities : Array[Ability] = []
@@ -45,15 +79,36 @@ var speed := 5
 var status_effects : Array[StatusEffect]
 var atk_mult := 1.0
 var atk_add := 0.0
+var def_mult := 1.0
+var def_add := 0.0
+var res_mult := 1.0
+var res_add := 0.0
+var speed_mult := 1.0
+var speed_add := 0.0
+var ap_cost_add := 0
+var prevent_adr_decay_turns := 0
+var adr_decay_locked := false
+var invulnerable_turns := 0
+var class_state := {}
 var is_current := false
 var terrain_cache := {}
 var suppress_action_done := false
+var _last_adrenaline_tier := 0
 @onready var _path_follow = $PathFollow3D
 		
 func set_cell(value: Vector3) -> void:
 	cell = grid.clamp(value)
 	
 func set_hp(value: float) -> void:
+	if invulnerable_turns > 0 and value < hp:
+		return
+	if value < hp:
+		var domination := get_status("Domination") as DominationEffect
+		if domination and domination.bubble_hp > 0.0:
+			var incoming := hp - value
+			var absorbed = min(incoming, domination.bubble_hp)
+			domination.bubble_hp -= absorbed
+			value += absorbed
 	hp = value
 	if hp >= max_hp:
 		hp = max_hp
@@ -74,16 +129,23 @@ func set_action_points(value: int) -> void:
 		signal_bus.action_done.emit()
 
 func set_adrenaline(value: float) -> void:
+	var old_tier := _last_adrenaline_tier
 	adrenaline = value
 	if adrenaline >= max_adr:
 		adrenaline = max_adr
 	if adrenaline <= 0:
 		adrenaline = 0
+	var new_tier := get_adrenaline_tier()
+	if character_class and new_tier != old_tier:
+		character_class.on_tier_changed(self, old_tier, new_tier)
+	_last_adrenaline_tier = new_tier
 	if is_current:
 		signal_bus.adr_update.emit(adrenaline, max_adr)
 	
 func turn_start() -> void:
 	#connected to  main turn start
+	if character_class:
+		character_class.on_turn_start(self)
 	for i in status_effects:
 		i.on_turn_start()
 	is_current = true
@@ -96,7 +158,12 @@ func turn_end() -> void:
 	is_current = false
 	for i in status_effects:
 		i.on_turn_end()
-	adrenaline -= adr_decay_per_turn
+	if invulnerable_turns > 0:
+		invulnerable_turns -= 1
+	if character_class:
+		character_class.on_turn_end(self)
+	else:
+		adrenaline -= adr_decay_per_turn
 	
 func status_update() -> void:
 	signal_bus.emit_signal("status_update", self, is_current)
@@ -105,10 +172,15 @@ func initialise() -> void:
 	action_points = ap_per_turn
 
 func _ready() -> void:
-	
+	if not character_class:
+		character_class = _build_default_class()
+	character_class.apply_to_character(self)
+	_last_adrenaline_tier = get_adrenaline_tier()
+	_instantiate_class_loadout()
 	for i in attack_abilities:
 		i.set_ability_owner(self)
-		i.set_range(atk_range,  1)
+		if i.uses_class_range:
+			i.set_range(atk_range,  1)
 		i.set_walkable(ground.get_walkable_cells())
 	for i in special_abilities:
 		i.set_ability_owner(self)
@@ -178,9 +250,30 @@ func walk_along(path: PackedVector3Array) -> void:
 	is_walking = true
 
 func get_atk_val() -> int:
-	return (atk + atk_add) * atk_mult
+	var base_atk := character_class.roll_attack_value(self) if character_class else atk
+	return maxi(0, roundi((base_atk + atk_add) * atk_mult))
+
+func get_scaled_atk_val(scaling_stat: String = "") -> int:
+	var scale := character_class.get_attack_scale(self, scaling_stat) if character_class else 1.0
+	return maxi(0, roundi(get_atk_val() * scale))
+
+func get_def() -> float:
+	var base_def := character_class.def if character_class else 10.0
+	return max(0.0, (base_def + def_add) * def_mult)
+
+func get_res() -> float:
+	var base_res := character_class.res if character_class else 1.0
+	return max(0.1, (base_res + res_add) * res_mult)
+
+func get_speed() -> float:
+	var base_speed := character_class.spd if character_class else 100.0
+	return max(1.0, (base_speed + speed_add) * speed_mult)
 
 func get_adrenaline_tier() -> int:
+	if character_class:
+		return character_class.get_adrenaline_tier(adrenaline)
+	if adrenaline >= tier_3_threshold:
+		return 3
 	if adrenaline >= tier_2_threshold:
 		return 2
 	if adrenaline >= tier_1_threshold:
@@ -188,10 +281,38 @@ func get_adrenaline_tier() -> int:
 	return 0
 
 func gain_adrenaline(amount: float) -> void:
-	adrenaline += amount
+	var final_amount := amount
+	var domination := get_status("Domination") as DominationEffect
+	if domination:
+		final_amount += amount * domination.adr_gain_multiplier
+	adrenaline += final_amount
 
 func spend_all_adrenaline() -> void:
 	adrenaline = 0
+
+func has_status(status_name: String) -> bool:
+	return get_status(status_name) != null
+
+func get_status(status_name: String) -> StatusEffect:
+	for status in status_effects:
+		if status.status_name == status_name:
+			return status
+	return null
+
+func take_damage(incoming_damage: float, source: Character = null, damage_type := "physical", can_miss := true) -> float:
+	if incoming_damage <= 0.0:
+		return 0.0
+	if can_miss and source and _attack_misses(source):
+		return 0.0
+	var final_damage := incoming_damage
+	if damage_type == "physical":
+		final_damage = max(0.0, incoming_damage - get_def())
+	else:
+		final_damage = incoming_damage / get_res()
+	hp -= final_damage
+	if character_class:
+		character_class.on_damage_taken(self, source, final_damage, damage_type)
+	return final_damage
 
 func attack(target: Character, abilityID: int) -> void:
 	#For attack, you pass a character object through the target and deduct its hp
@@ -208,6 +329,8 @@ func attack(target: Character, abilityID: int) -> void:
 		return
 	_path_follow.look_at(target.position, Vector3(0,1,0), true)
 	ability.execute(target)
+	if character_class:
+		character_class.on_attack_executed(self, ability, target, ability.last_damage_done)
 	print("AP cost: ", cost)
 	action_points = action_points - cost
 	
@@ -215,3 +338,35 @@ func attack(target: Character, abilityID: int) -> void:
 func die() -> void:
 	signal_bus.unit_death.emit(self)
 	queue_free()
+
+func _attack_misses(source: Character) -> bool:
+	var source_speed := max(1.0, source.get_speed())
+	var dodge_chance := max(0.0, (get_speed() - source_speed) / source_speed * 100.0)
+	return randf_range(0.0, 100.0) < dodge_chance
+
+func _build_default_class() -> CharacterClass:
+	if cname == "P1":
+		return EliteGuardClass.new()
+	if cname == "P2":
+		return HeavyGuardClass.new()
+	if cname.to_lower().contains("research"):
+		return ResearcherClass.new()
+	return HeavyGuardClass.new()
+
+func _instantiate_class_loadout() -> void:
+	if not character_class:
+		return
+	if not character_class.attack_ability_scenes.is_empty():
+		attack_abilities.clear()
+		for scene in character_class.attack_ability_scenes:
+			var ability := scene.instantiate() as Ability
+			if ability:
+				add_child(ability)
+				attack_abilities.append(ability)
+	if not character_class.special_ability_scenes.is_empty():
+		special_abilities.clear()
+		for scene in character_class.special_ability_scenes:
+			var ability := scene.instantiate() as SpecialAbility
+			if ability:
+				add_child(ability)
+				special_abilities.append(ability)

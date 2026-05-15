@@ -99,7 +99,7 @@ func evaluate_target_value(target: Character, ability: Ability) -> float:
 	var score = 0.0
 	
 	# Safely estimate damage (Assuming your ability script has a 'damage' or 'base_damage' property)
-	var estimated_damage = ability.get_damage_multiplier() * actor.atk * actor.atk_mult * ability.get_hit_count()
+	var estimated_damage = ability.get_damage_multiplier() * actor.get_atk_val() * ability.get_hit_count()
 	
 	# 1. Damage Efficiency: Reward using strong attacks against enemies
 	var health_percentage_taken = float(estimated_damage) / float(target.max_hp)
@@ -112,6 +112,8 @@ func evaluate_target_value(target: Character, ability: Ability) -> float:
 	# 3. Focus Fire: Bonus for targeting units that are already heavily injured
 	var missing_health_ratio = 1.0 - (float(target.hp) / float(target.max_hp))
 	score += missing_health_ratio * 40.0
+	if target.class_state.has("sentinel_threat"):
+		score *= float(target.class_state["sentinel_threat"])
 	
 	return score
 func evaluate_attack(tile: Vector3, remaining_ap: int, targets: Array[Character]) -> float:
